@@ -20,6 +20,8 @@ class GenerativeSoundscape {
         this.schedulers = {};
         this.animatedParams = new Map();
         this.lfoControllers = new Map();
+        this.modulationModes = new Map(); // Track modulation mode for each parameter
+        this.randomIntervals = new Map(); // Track random jump intervals
         this.activeVoices = 0;
         this.maxVoices = 30; // Reduced voice limit for better performance
         this.drumVoices = 0;
@@ -94,6 +96,8 @@ class GenerativeSoundscape {
                 const param = e.target.dataset.param;
                 this.toggleLFO(param, e.target);
             });
+            // Initialize button text
+            button.textContent = 'MOD';
         });
         
         // Noise type selector
@@ -188,6 +192,12 @@ class GenerativeSoundscape {
             cancelAnimationFrame(animation.frameId);
         });
         this.animatedParams.clear();
+        
+        // Stop random intervals
+        this.randomIntervals.forEach(interval => {
+            clearInterval(interval);
+        });
+        this.randomIntervals.clear();
         
         // Disconnect all nodes
         this.disconnectAll();
@@ -2076,36 +2086,124 @@ class GenerativeSoundscape {
         });
     }
 
-    // LFO/ANIMATION SYSTEM
+    // MODULATION SYSTEM (fixed > LFO > random > other)
     toggleLFO(paramId, button) {
+        // Get current mode (default to 'fixed' if not set)
+        let currentMode = this.modulationModes.get(paramId) || 'fixed';
+        
+        // Clean up current mode
+        this.cleanupModulation(paramId);
+        
+        // Cycle to next mode
+        const modes = ['fixed', 'lfo', 'random', 'other'];
+        const currentIndex = modes.indexOf(currentMode);
+        const nextMode = modes[(currentIndex + 1) % modes.length];
+        
+        // Set new mode
+        this.modulationModes.set(paramId, nextMode);
+        
+        // Update button appearance and start modulation
+        switch(nextMode) {
+            case 'fixed':
+                button.textContent = 'MOD';
+                button.classList.remove('active', 'random', 'other');
+                break;
+                
+            case 'lfo':
+                button.textContent = 'LFO';
+                button.classList.add('active');
+                button.classList.remove('random', 'other');
+                this.startLFO(paramId);
+                break;
+                
+            case 'random':
+                button.textContent = 'RND';
+                button.classList.add('active', 'random');
+                button.classList.remove('other');
+                this.startRandomJumps(paramId);
+                break;
+                
+            case 'other':
+                button.textContent = 'OTH';
+                button.classList.add('active', 'other');
+                button.classList.remove('random');
+                this.startOtherModulation(paramId);
+                break;
+        }
+    }
+    
+    cleanupModulation(paramId) {
+        // Stop LFO animation
         if (this.animatedParams.has(paramId)) {
-            // Stop animation
             const animation = this.animatedParams.get(paramId);
             cancelAnimationFrame(animation.frameId);
             this.animatedParams.delete(paramId);
-            button.classList.remove('active');
+        }
+        
+        // Stop random jumps
+        if (this.randomIntervals.has(paramId)) {
+            clearInterval(this.randomIntervals.get(paramId));
+            this.randomIntervals.delete(paramId);
+        }
+        
+        // Remove slider animation class
+        const slider = document.getElementById(paramId);
+        if (slider) {
+            slider.classList.remove('animated', 'random-jump', 'other-mod');
+        }
+    }
+    
+    startLFO(paramId) {
+        const slider = document.getElementById(paramId);
+        if (slider) {
+            slider.classList.add('animated');
+            // Get LFO speed from drone LFO control (or use default)
+            const lfoSpeed = parseFloat(document.getElementById('droneLFO').value) || 0.5;
+            const animation = {
+                min: parseFloat(slider.min),
+                max: parseFloat(slider.max),
+                speed: lfoSpeed,
+                phase: 0
+            };
+            this.animatedParams.set(paramId, animation);
+            this.animateParameter(paramId, animation);
+        }
+    }
+    
+    startRandomJumps(paramId) {
+        const slider = document.getElementById(paramId);
+        if (slider) {
+            slider.classList.add('random-jump');
+            const jumpInterval = setInterval(() => {
+                const min = parseFloat(slider.min);
+                const max = parseFloat(slider.max);
+                const value = Math.random() * (max - min) + min;
+                slider.value = value;
+                slider.dispatchEvent(new Event('input'));
+            }, 500 + Math.random() * 1500); // Random interval between 0.5-2 seconds
             
-            const slider = document.getElementById(paramId);
-            if (slider) {
-                slider.classList.remove('animated');
-            }
-        } else {
-            // Start animation
-            button.classList.add('active');
-            const slider = document.getElementById(paramId);
-            if (slider) {
-                slider.classList.add('animated');
-                // Get LFO speed from drone LFO control (or use default)
-                const lfoSpeed = parseFloat(document.getElementById('droneLFO').value) || 0.5;
-                const animation = {
-                    min: parseFloat(slider.min),
-                    max: parseFloat(slider.max),
-                    speed: lfoSpeed,
-                    phase: 0
-                };
-                this.animatedParams.set(paramId, animation);
-                this.animateParameter(paramId, animation);
-            }
+            this.randomIntervals.set(paramId, jumpInterval);
+        }
+    }
+    
+    startOtherModulation(paramId) {
+        const slider = document.getElementById(paramId);
+        if (slider) {
+            slider.classList.add('other-mod');
+            // Implement a stepped/quantized modulation
+            const steps = 8;
+            let currentStep = 0;
+            const stepInterval = setInterval(() => {
+                const min = parseFloat(slider.min);
+                const max = parseFloat(slider.max);
+                const stepSize = (max - min) / steps;
+                const value = min + (currentStep * stepSize);
+                slider.value = value;
+                slider.dispatchEvent(new Event('input'));
+                currentStep = (currentStep + 1) % steps;
+            }, 400);
+            
+            this.randomIntervals.set(paramId, stepInterval);
         }
     }
 
@@ -2300,6 +2398,39 @@ class GenerativeSoundscape {
             const arpPatterns = ['up', 'down', 'updown', 'random'];
             this.morphTargets.set('arpPattern', arpPatterns[Math.floor(Math.random() * arpPatterns.length)]);
         }
+        
+        // Randomly enable/disable groups (70% chance to be enabled)
+        Object.keys(this.groupEnabled).forEach(group => {
+            const shouldEnable = Math.random() < 0.7;
+            this.morphTargets.set(group + 'Enable', shouldEnable);
+        });
+        
+        // Randomly set modulation modes for parameters with modulation buttons
+        const modulatableParams = [
+            'reverb', 'delay',
+            'droneFreq', 'droneFilter', 'droneDetune',
+            'glitchIntensity', 'glitchRate', 'bitCrush', 
+            'drumTempo', 'drumDensity', 'drumSwing',
+            'bleepRange', 'bleepDuration',
+            'burstActivity', 'burstSpeed',
+            'fmCarrier', 'fmIndex', 'fmRatio',
+            'noiseFilter', 'noiseLevel',
+            'acidFreq', 'acidResonance',
+            'grainDensity', 'grainSize', 'grainPitch',
+            'spaceMelodyDensity', 'spaceMelodySpeed', 'spaceMelodyPortamento', 'spaceMelodyEcho',
+            'padFilterSweep', 'padShimmer',
+            'arpSpeed', 'arpGate'
+        ];
+        modulatableParams.forEach(param => {
+            // 20% chance to activate modulation
+            if (Math.random() < 0.2) {
+                const modes = ['lfo', 'random', 'other'];
+                const randomMode = modes[Math.floor(Math.random() * modes.length)];
+                this.morphTargets.set(param + 'Mod', randomMode);
+            } else {
+                this.morphTargets.set(param + 'Mod', 'fixed');
+            }
+        });
     }
     
     animateMorph() {
@@ -2349,6 +2480,58 @@ class GenerativeSoundscape {
                 arpPattern.value = this.morphTargets.get('arpPattern');
                 arpPattern.dispatchEvent(new Event('change'));
             }
+            
+            // Apply group enable/disable states
+            Object.keys(this.groupEnabled).forEach(group => {
+                const enableKey = group + 'Enable';
+                if (this.morphTargets.has(enableKey)) {
+                    const toggle = document.getElementById(enableKey);
+                    if (toggle) {
+                        const shouldEnable = this.morphTargets.get(enableKey);
+                        if (toggle.checked !== shouldEnable) {
+                            toggle.checked = shouldEnable;
+                            toggle.dispatchEvent(new Event('change'));
+                        }
+                    }
+                }
+            });
+            
+            // Apply modulation modes
+            const modulatableParams = [
+                'reverb', 'delay',
+                'droneFreq', 'droneFilter', 'droneDetune',
+                'glitchIntensity', 'glitchRate', 'bitCrush', 
+                'drumTempo', 'drumDensity', 'drumSwing',
+                'bleepRange', 'bleepDuration',
+                'burstActivity', 'burstSpeed',
+                'fmCarrier', 'fmIndex', 'fmRatio',
+                'noiseFilter', 'noiseLevel',
+                'acidFreq', 'acidResonance',
+                'grainDensity', 'grainSize', 'grainPitch',
+                'spaceMelodyDensity', 'spaceMelodySpeed', 'spaceMelodyPortamento', 'spaceMelodyEcho',
+                'padFilterSweep', 'padShimmer',
+                'arpSpeed', 'arpGate'
+            ];
+            modulatableParams.forEach(param => {
+                const modKey = param + 'Mod';
+                if (this.morphTargets.has(modKey)) {
+                    const targetMode = this.morphTargets.get(modKey);
+                    const button = document.querySelector(`.lfo-button[data-param="${param}"]`);
+                    if (button) {
+                        const currentMode = this.modulationModes.get(param) || 'fixed';
+                        // Click button until we reach target mode
+                        if (currentMode !== targetMode) {
+                            const modes = ['fixed', 'lfo', 'random', 'other'];
+                            const currentIndex = modes.indexOf(currentMode);
+                            const targetIndex = modes.indexOf(targetMode);
+                            let clicks = (targetIndex - currentIndex + 4) % 4;
+                            for (let i = 0; i < clicks; i++) {
+                                button.click();
+                            }
+                        }
+                    }
+                }
+            });
             
             this.morphing = false;
             document.getElementById('morphButton').textContent = '〰️ Morph';

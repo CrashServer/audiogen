@@ -147,12 +147,34 @@ input[type="range"] {
 }
 
 input[type="range"].animated {
-    background: linear-gradient(90deg, #fff 0%, #333 50%, #fff 100%);
+    background: linear-gradient(90deg, #0f0 0%, #333 50%, #0f0 100%);
     background-size: 200% 100%;
     animation: slide 2s linear infinite;
 }
 
+input[type="range"].random-jump {
+    background: linear-gradient(90deg, #f0f 0%, #333 50%, #f0f 100%);
+    background-size: 200% 100%;
+    animation: pulse 0.5s ease-in-out infinite;
+}
+
+input[type="range"].other-mod {
+    background: linear-gradient(90deg, #0ff 0%, #333 50%, #0ff 100%);
+    background-size: 200% 100%;
+    animation: step 0.4s steps(8) infinite;
+}
+
 @keyframes slide {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 200% 0%; }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes step {
     0% { background-position: 0% 0%; }
     100% { background-position: 200% 0%; }
 }
@@ -204,6 +226,8 @@ input[type="range"]::-moz-range-thumb:hover {
     text-transform: uppercase;
     transition: all 0.2s ease;
     white-space: nowrap;
+    font-family: 'Monaco', 'Courier New', monospace;
+    min-width: 40px;
 }
 
 .lfo-button:hover {
@@ -213,8 +237,18 @@ input[type="range"]::-moz-range-thumb:hover {
 
 .lfo-button.active {
     color: #000;
-    background: #fff;
-    border-color: #fff;
+    background: #0f0;
+    border-color: #0f0;
+}
+
+.lfo-button.active.random {
+    background: #f0f;
+    border-color: #f0f;
+}
+
+.lfo-button.active.other {
+    background: #0ff;
+    border-color: #0ff;
 }
 
 select {
@@ -233,9 +267,15 @@ select option {
     color: #fff;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1200px) {
     .columns-container {
-        flex-direction: column;
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 800px) {
+    .columns-container {
+        grid-template-columns: 1fr;
         gap: 0;
     }
 }
@@ -310,15 +350,15 @@ h2 {
     align-items: center;
 }
 
-/* Two column layout */
+/* Three column layout */
 .columns-container {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     margin-top: 1rem;
 }
 
 .column {
-    flex: 1;
     min-width: 0;
 }
 
