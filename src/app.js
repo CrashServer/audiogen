@@ -566,7 +566,6 @@ export class GenerativeSoundscape {
                 // No mapping needed anymore
                 
                 if (this.groupEnabled.hasOwnProperty(groupName)) {
-                    this.groupEnabled[groupName] = e.target.checked;
                     this.updateGroupState(groupName, e.target.checked);
                 }
             });
@@ -1033,7 +1032,10 @@ export class GenerativeSoundscape {
     }
 
     updateGroupState(groupName, enabled) {
-        // Only update if we're playing
+        // Update the state immediately
+        this.groupEnabled[groupName] = enabled;
+        
+        // Only start/stop generators if we're playing
         if (!this.isPlaying) return;
         
         // Stop the generator
@@ -1042,7 +1044,7 @@ export class GenerativeSoundscape {
         }
         
         // Restart if enabled
-        if (enabled && this.isPlaying) {
+        if (enabled) {
             switch(groupName) {
                 case 'drone':
                     const droneParams = {
