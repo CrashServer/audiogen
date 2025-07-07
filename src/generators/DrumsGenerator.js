@@ -29,13 +29,13 @@ export class DrumsGenerator {
             
             // Kick
             if (currentPattern.kick[patternStep] && Math.random() < density) {
-                const velocity = currentPattern.kick[patternStep] * 0.7;
+                const velocity = currentPattern.kick[patternStep] * 0.9;
                 setTimeout(() => this.playKick(this.audioContext.currentTime, variation, velocity), microTiming);
             }
             
             // Snare with rush
             if (currentPattern.snare[patternStep] && Math.random() < density * 0.9) {
-                const velocity = currentPattern.snare[patternStep] * 0.5;
+                const velocity = currentPattern.snare[patternStep] * 0.8;
                 setTimeout(() => {
                     this.playSnare(this.audioContext.currentTime, variation, velocity);
                     if (Math.random() < snareRush && patternStep % 4 === 0) {
@@ -46,7 +46,7 @@ export class DrumsGenerator {
             
             // Hi-hat
             if (step % (16 / hihatSpeed) === 0 && currentPattern.hihat[patternStep % 16] && Math.random() < density * 0.8) {
-                const velocity = currentPattern.hihat[patternStep % 16] * 0.3;
+                const velocity = currentPattern.hihat[patternStep % 16] * 0.5;
                 const isOpen = (patternStep % 4 === 2) && Math.random() < 0.3;
                 setTimeout(() => this.playHiHat(this.audioContext.currentTime, variation, velocity, isOpen), microTiming);
             }
@@ -67,11 +67,11 @@ export class DrumsGenerator {
                 setTimeout(() => {
                     const drumType = Math.random();
                     if (drumType < 0.4) {
-                        this.playKick(this.audioContext.currentTime, variation * 2, 0.2);
+                        this.playKick(this.audioContext.currentTime, variation * 2, 0.3);
                     } else if (drumType < 0.7) {
-                        this.playSnare(this.audioContext.currentTime, variation * 2, 0.15);
+                        this.playSnare(this.audioContext.currentTime, variation * 2, 0.25);
                     } else {
-                        this.playHiHat(this.audioContext.currentTime, variation * 2, 0.1);
+                        this.playHiHat(this.audioContext.currentTime, variation * 2, 0.2);
                     }
                 }, ghostTime);
             }

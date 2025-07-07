@@ -1203,7 +1203,7 @@ export class GenerativeSoundscape {
             { id: 'bitCrush', min: 4, max: 16 },
             // Drums  
             { id: 'drumTempo', min: 80, max: 140 },
-            { id: 'drumDensity', min: 0, max: 60 },
+            { id: 'drumDensity', min: 20, max: 80 },
             { id: 'drumVariation', min: 0, max: 50 },
             { id: 'drumSwing', min: 0, max: 50 },
             { id: 'snareRush', min: 0, max: 30 },
@@ -1317,7 +1317,10 @@ export class GenerativeSoundscape {
                     }
                 } else {
                     // For enabled groups, use weighted randomization
-                    if (param.id.includes('Density') || param.id.includes('Intensity') || 
+                    if (param.id === 'drumDensity') {
+                        // Special case for drums - favor higher values for better audibility
+                        value = param.min + Math.pow(Math.random(), 0.7) * (param.max - param.min);
+                    } else if (param.id.includes('Density') || param.id.includes('Intensity') || 
                         param.id.includes('Level') || param.id.includes('Enable') || 
                         param.id.includes('Activity') || param.id.includes('Rush') || 
                         param.id.includes('Ghost')) {
@@ -1464,7 +1467,7 @@ export class GenerativeSoundscape {
             { id: 'bitCrush', min: 4, max: 16, group: 'glitch' },
             // Drums
             { id: 'drumTempo', min: 80, max: 140, group: 'drums' },
-            { id: 'drumDensity', min: 0, max: 60, group: 'drums' },
+            { id: 'drumDensity', min: 20, max: 80, group: 'drums' },
             { id: 'drumVariation', min: 0, max: 50, group: 'drums' },
             { id: 'drumSwing', min: 0, max: 50, group: 'drums' },
             { id: 'snareRush', min: 0, max: 30, group: 'drums' },
@@ -1554,7 +1557,10 @@ export class GenerativeSoundscape {
             
             let value;
             // Use same biasing as randomize
-            if (param.id.includes('Density') || param.id.includes('Intensity') || 
+            if (param.id === 'drumDensity') {
+                // Special case for drums - favor higher values for better audibility
+                value = param.min + Math.pow(Math.random(), 0.7) * (param.max - param.min);
+            } else if (param.id.includes('Density') || param.id.includes('Intensity') || 
                 param.id.includes('Level') || param.id.includes('Enable') || 
                 param.id.includes('Activity') || param.id.includes('Rush') || 
                 param.id.includes('Ghost')) {
