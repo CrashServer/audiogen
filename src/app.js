@@ -464,7 +464,30 @@ export class GenerativeSoundscape {
                 }
                 
                 if (this.isPlaying) {
-                    this.updateParameter(control.id, parseFloat(control.value));
+                    // Check which group this parameter belongs to
+                    const groupName = this.getGroupForParameter(control.id);
+                    
+                    // If it's a group-specific parameter and the group is enabled, restart the generator
+                    if (groupName && this.groupEnabled[groupName]) {
+                        // For generators that need restarting on parameter change
+                        const generatorsNeedingRestart = [
+                            'bleeps', 'burst', 'acid', 'granular', 'spaceMelody', 
+                            'ambientPad', 'arpeggiator', 'chord', 'vocal', 
+                            'karplus', 'additive', 'sample'
+                        ];
+                        
+                        if (generatorsNeedingRestart.includes(groupName)) {
+                            // Restart the generator with new parameters
+                            this.updateGroupState(groupName, false);
+                            this.updateGroupState(groupName, true);
+                        } else {
+                            // Try dynamic update first
+                            this.updateParameter(control.id, parseFloat(control.value));
+                        }
+                    } else {
+                        // Master parameters or other non-group parameters
+                        this.updateParameter(control.id, parseFloat(control.value));
+                    }
                 }
             });
         });
@@ -865,6 +888,7 @@ export class GenerativeSoundscape {
     }
 
     updateGroupState(groupName, enabled) {
+        // Only update if we're playing
         if (!this.isPlaying) return;
         
         // Stop the generator
@@ -873,7 +897,7 @@ export class GenerativeSoundscape {
         }
         
         // Restart if enabled
-        if (enabled) {
+        if (enabled && this.isPlaying) {
             switch(groupName) {
                 case 'drone':
                     const droneParams = {
