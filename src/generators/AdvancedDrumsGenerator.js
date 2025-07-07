@@ -13,6 +13,22 @@ export class AdvancedDrumsGenerator {
         this.scheduler = null;
         this.isPlaying = false;
         
+        // Sample storage for external drum kits
+        this.drumSamples = new Map();
+        this.sampleMapping = {
+            kick: null,
+            snare: null,
+            hihat: null,
+            openhat: null,
+            clap: null,
+            ride: null,
+            crash: null,
+            perc1: null,
+            perc2: null,
+            perc3: null
+        };
+        this.useSamples = false;
+        
         // Pattern generators
         this.probabilityTriggers = {
             kick: new ProbabilityTrigger(),
@@ -42,6 +58,132 @@ export class AdvancedDrumsGenerator {
         this.traditionalPatterns = this.getTraditionalPatterns();
     }
     
+    setupFileInput() {
+        // This will be called from the app after DOM is ready
+        const fileInput = document.getElementById('drumKitFileInput');
+        if (fileInput && !fileInput.hasAttribute('data-listener-attached')) {
+            fileInput.setAttribute('data-listener-attached', 'true');
+            fileInput.addEventListener('change', async (e) => {
+                const files = Array.from(e.target.files);
+                await this.loadDrumKit(files);
+            });
+        }
+    }
+    
+    async loadDrumKit(files) {
+        // Clear existing samples
+        this.drumSamples.clear();
+        Object.keys(this.sampleMapping).forEach(key => {
+            this.sampleMapping[key] = null;
+        });
+        
+        // Load each file
+        for (const file of files) {
+            if (file.type.startsWith('audio/')) {
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+                    const sampleName = file.name.toLowerCase().replace(/\.[^/.]+$/, '');
+                    
+                    this.drumSamples.set(sampleName, audioBuffer);
+                    this.autoMapSample(sampleName);
+                    
+                    console.log(`Loaded drum sample: ${sampleName}`);
+                } catch (err) {
+                    console.warn(`Failed to load drum sample ${file.name}:`, err);
+                }
+            }
+        }
+        
+        this.updateSampleMappingUI();
+    }
+    
+    autoMapSample(sampleName) {
+        const name = sampleName.toLowerCase();
+        
+        if (name.includes('kick') || name.includes('bd') || name.includes('bass')) {
+            if (!this.sampleMapping.kick) this.sampleMapping.kick = sampleName;
+        } else if (name.includes('snare') || name.includes('sd')) {
+            if (!this.sampleMapping.snare) this.sampleMapping.snare = sampleName;
+        } else if (name.includes('hihat') || name.includes('hh') || name.includes('hat')) {
+            if (name.includes('open') || name.includes('oh')) {
+                if (!this.sampleMapping.openhat) this.sampleMapping.openhat = sampleName;
+            } else {
+                if (!this.sampleMapping.hihat) this.sampleMapping.hihat = sampleName;
+            }
+        } else if (name.includes('clap') || name.includes('cp')) {
+            if (!this.sampleMapping.clap) this.sampleMapping.clap = sampleName;
+        } else if (name.includes('ride') || name.includes('rd')) {
+            if (!this.sampleMapping.ride) this.sampleMapping.ride = sampleName;
+        } else if (name.includes('crash') || name.includes('cr')) {
+            if (!this.sampleMapping.crash) this.sampleMapping.crash = sampleName;
+        } else if (name.includes('perc') || name.includes('pc')) {
+            if (!this.sampleMapping.perc1) this.sampleMapping.perc1 = sampleName;
+            else if (!this.sampleMapping.perc2) this.sampleMapping.perc2 = sampleName;
+            else if (!this.sampleMapping.perc3) this.sampleMapping.perc3 = sampleName;
+        }
+    }
+    
+    updateSampleMappingUI() {
+        const statusElement = document.getElementById('drumKitStatus');
+        const mappingDisplay = document.getElementById('sampleMappingDisplay');
+        const mappingList = document.getElementById('mappingList');
+        
+        if (statusElement) {
+            const loadedCount = this.drumSamples.size;
+            const mappedCount = Object.values(this.sampleMapping).filter(v => v !== null).length;
+            statusElement.textContent = loadedCount > 0 ? 
+                `${loadedCount} samples loaded, ${mappedCount} mapped` : 
+                'No samples loaded';
+        }
+        
+        if (mappingDisplay && mappingList) {
+            if (this.drumSamples.size > 0) {
+                mappingDisplay.style.display = 'block';
+                mappingList.innerHTML = '';
+                
+                // Show mapped samples
+                for (const [drumType, sampleName] of Object.entries(this.sampleMapping)) {
+                    if (sampleName) {
+                        const item = document.createElement('div');
+                        item.className = 'mapping-item';
+                        item.innerHTML = `
+                            <span>${drumType}:</span>
+                            <span class="mapping-name">${sampleName}</span>
+                        `;
+                        mappingList.appendChild(item);
+                    }
+                }
+                
+                // Show unmapped samples
+                const unmapped = [];
+                for (const [sampleName] of this.drumSamples) {
+                    if (!Object.values(this.sampleMapping).includes(sampleName)) {
+                        unmapped.push(sampleName);
+                    }
+                }
+                
+                if (unmapped.length > 0) {
+                    const divider = document.createElement('div');
+                    divider.style.marginTop = '0.5rem';
+                    divider.style.paddingTop = '0.5rem';
+                    divider.style.borderTop = '1px solid #333';
+                    divider.innerHTML = '<span style="color: #666;">Unmapped samples:</span>';
+                    mappingList.appendChild(divider);
+                    
+                    unmapped.forEach(name => {
+                        const item = document.createElement('div');
+                        item.className = 'mapping-item';
+                        item.innerHTML = `<span style="color: #666;">${name}</span>`;
+                        mappingList.appendChild(item);
+                    });
+                }
+            } else {
+                mappingDisplay.style.display = 'none';
+            }
+        }
+    }
+    
     trainMarkovChains() {
         // Train with common patterns
         this.markovChains.kick.train([1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0]);
@@ -62,6 +204,7 @@ export class AdvancedDrumsGenerator {
         
         this.masterNodes = masterNodes;
         this.params = params;
+        this.useSamples = params.useSamples || false;
         
         // Generate patterns based on mode
         this.generatePatterns();
@@ -202,24 +345,59 @@ export class AdvancedDrumsGenerator {
     
     // Simplified drum sound methods (reuse from original DrumsGenerator)
     playKick(velocity) {
-        const time = this.audioContext.currentTime;
-        const osc = this.audioContext.createOscillator();
+        // Use sample if available and enabled
+        if (this.useSamples && this.sampleMapping.kick) {
+            this.playSample(this.sampleMapping.kick, velocity);
+        } else {
+            // Synthesized kick
+            const time = this.audioContext.currentTime;
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+            
+            osc.frequency.setValueAtTime(60, time);
+            osc.frequency.exponentialRampToValueAtTime(30, time + 0.1);
+            
+            gain.gain.setValueAtTime(velocity, time);
+            gain.gain.exponentialRampToValueAtTime(0.01, time + 0.5);
+            
+            osc.connect(gain);
+            this.connectToMaster(gain);
+            
+            osc.start(time);
+            osc.stop(time + 0.5);
+        }
+    }
+    
+    playSample(sampleName, velocity) {
+        const buffer = this.drumSamples.get(sampleName);
+        if (!buffer) return;
+        
+        const source = this.audioContext.createBufferSource();
+        source.buffer = buffer;
+        
+        // Apply pitch and pitch variation
+        const basePitch = this.params.samplePitch || 1;
+        const pitchVariation = (this.params.pitchVariation || 0) / 100;
+        const pitch = basePitch + (Math.random() - 0.5) * pitchVariation * 0.5;
+        source.playbackRate.value = pitch;
+        
         const gain = this.audioContext.createGain();
+        gain.gain.value = velocity;
         
-        osc.frequency.setValueAtTime(60, time);
-        osc.frequency.exponentialRampToValueAtTime(30, time + 0.1);
-        
-        gain.gain.setValueAtTime(velocity, time);
-        gain.gain.exponentialRampToValueAtTime(0.01, time + 0.5);
-        
-        osc.connect(gain);
+        source.connect(gain);
         this.connectToMaster(gain);
         
-        osc.start(time);
-        osc.stop(time + 0.5);
+        source.start();
     }
     
     playSnare(velocity) {
+        // Use sample if available and enabled
+        if (this.useSamples && this.sampleMapping.snare) {
+            this.playSample(this.sampleMapping.snare, velocity);
+            return;
+        }
+        
+        // Synthesized snare
         const time = this.audioContext.currentTime;
         
         // Noise
@@ -262,6 +440,18 @@ export class AdvancedDrumsGenerator {
     }
     
     playHihat(velocity, isOpen) {
+        // Use sample if available and enabled
+        if (this.useSamples) {
+            if (isOpen && this.sampleMapping.openhat) {
+                this.playSample(this.sampleMapping.openhat, velocity);
+                return;
+            } else if (!isOpen && this.sampleMapping.hihat) {
+                this.playSample(this.sampleMapping.hihat, velocity);
+                return;
+            }
+        }
+        
+        // Synthesized hi-hat
         const time = this.audioContext.currentTime;
         const duration = isOpen ? 0.3 : 0.05;
         

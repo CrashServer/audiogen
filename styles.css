@@ -542,3 +542,65 @@ h2 {
 .polyrhythm-controls {
     transition: opacity 0.3s;
 }
+
+/* Drum kit sample UI styles */
+.status-text {
+    color: #666;
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+.info-text {
+    color: #666;
+    font-size: 0.7rem;
+    margin-left: 10px;
+}
+
+.sample-mapping {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 4px;
+}
+
+.sample-mapping h3 {
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+    color: #999;
+}
+
+.mapping-list {
+    font-size: 0.7rem;
+    color: #ccc;
+}
+
+.mapping-list .mapping-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #222;
+}
+
+.mapping-list .mapping-item:last-child {
+    border-bottom: none;
+}
+
+.mapping-list .mapping-name {
+    color: #0f0;
+}
+
+input[type="file"] {
+    background: #222;
+    border: 1px solid #444;
+    padding: 0.5rem;
+    color: #fff;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+input[type="file"]:hover {
+    border-color: #666;
+    background: #333;
+}

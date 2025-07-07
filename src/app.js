@@ -15,7 +15,6 @@ import { ChordGenerator } from './generators/ChordGenerator.js';
 import { VocalSynthGenerator } from './generators/VocalSynthGenerator.js';
 import { KarplusStrongGenerator } from './generators/KarplusStrongGenerator.js';
 import { AdditiveSynthGenerator } from './generators/AdditiveSynthGenerator.js';
-import { SamplePlayerGenerator } from './generators/SamplePlayerGenerator.js';
 import { MasterBus } from './effects/MasterBus.js';
 import { PoolManager } from './utils/VoicePool.js';
 import { ADSREnvelope } from './utils/ADSREnvelope.js';
@@ -61,8 +60,7 @@ export class GenerativeSoundscape {
             chord: true,
             vocal: true,
             karplus: true,
-            additive: true,
-            sample: true
+            additive: true
         };
         
         // Animation state
@@ -499,6 +497,15 @@ export class GenerativeSoundscape {
             }
         });
         
+        // Sample kit toggle
+        addListener('useSampleKit', 'change', (e) => {
+            // Restart drums if playing to switch between sample kit and synthesis
+            if (this.isPlaying && this.groupEnabled.drums) {
+                this.updateGroupState('drums', false);
+                this.updateGroupState('drums', true);
+            }
+        });
+        
         // Automation controls
         addListener('automationRecord', 'click', () => {
             if (!this.automationRecorder) return;
@@ -802,6 +809,11 @@ export class GenerativeSoundscape {
         this.generators.drums = useAdvancedDrums ? 
             new AdvancedDrumsGenerator(this.audioContext, this.poolManager) :
             new DrumsGenerator(this.audioContext, this.poolManager);
+            
+        // Setup file input for drums if advanced
+        if (this.generators.drums.setupFileInput) {
+            this.generators.drums.setupFileInput();
+        }
         this.generators.glitch = new GlitchGenerator(this.audioContext, this.poolManager);
         this.generators.bleeps = new SineBleepsGenerator(this.audioContext, this.poolManager);
         this.generators.burst = new DataBurstGenerator(this.audioContext, this.poolManager);
@@ -816,7 +828,6 @@ export class GenerativeSoundscape {
         this.generators.vocal = new VocalSynthGenerator(this.audioContext, this.poolManager);
         this.generators.karplus = new KarplusStrongGenerator(this.audioContext, this.poolManager);
         this.generators.additive = new AdditiveSynthGenerator(this.audioContext, this.poolManager);
-        this.generators.sample = new SamplePlayerGenerator(this.audioContext, this.poolManager);
     }
 
     startGenerators() {
@@ -853,8 +864,12 @@ export class GenerativeSoundscape {
                 snarePulses: parseInt(document.getElementById('snarePulses')?.value || 2),
                 hihatPulses: parseInt(document.getElementById('hihatPulses')?.value || 8),
                 probability: document.getElementById('drumProbability')?.checked,
-                humanize: parseFloat(document.getElementById('drumHumanize')?.value || 20) / 100
+                humanize: parseFloat(document.getElementById('drumHumanize')?.value || 20) / 100,
+                useSamples: document.getElementById('useSampleKit')?.checked || false,
+                samplePitch: parseFloat(document.getElementById('drumSamplePitch')?.value || 1),
+                pitchVariation: parseFloat(document.getElementById('drumPitchVariation')?.value || 0)
             };
+            
             this.generators.drums.start(drumParams, this.masterBus.getConnectionNodes());
         }
         
@@ -1030,19 +1045,6 @@ export class GenerativeSoundscape {
             };
             this.generators.additive.start(additiveParams, (node) => this.connectToMaster(node));
         }
-        
-        // Start Sample Player if enabled
-        if (this.groupEnabled.sample) {
-            const sampleParams = {
-                density: parseFloat(document.getElementById('sampleDensity').value) / 100,
-                sample: document.getElementById('sampleSelect').value,
-                pitch: parseFloat(document.getElementById('samplePitch').value),
-                reverse: parseFloat(document.getElementById('sampleReverse').value) / 100 > 0.5,
-                chop: parseFloat(document.getElementById('sampleChop').value) / 100,
-                scatter: parseFloat(document.getElementById('sampleScatter').value) / 100
-            };
-            this.generators.sample.start(sampleParams, (node) => this.connectToMaster(node));
-        }
     }
 
     connectToMaster(node) {
@@ -1092,6 +1094,11 @@ export class GenerativeSoundscape {
                         this.generators.drums = needsAdvanced ? 
                             new AdvancedDrumsGenerator(this.audioContext, this.poolManager) :
                             new DrumsGenerator(this.audioContext, this.poolManager);
+                            
+                        // Setup file input for drums if advanced
+                        if (this.generators.drums.setupFileInput) {
+                            this.generators.drums.setupFileInput();
+                        }
                     }
                     
                     const drumParams = {
@@ -1110,8 +1117,12 @@ export class GenerativeSoundscape {
                         snarePulses: parseInt(document.getElementById('snarePulses')?.value || 2),
                         hihatPulses: parseInt(document.getElementById('hihatPulses')?.value || 8),
                         probability: document.getElementById('drumProbability')?.checked,
-                        humanize: parseFloat(document.getElementById('drumHumanize')?.value || 20) / 100
+                        humanize: parseFloat(document.getElementById('drumHumanize')?.value || 20) / 100,
+                        useSamples: document.getElementById('useSampleKit')?.checked || false,
+                        samplePitch: parseFloat(document.getElementById('drumSamplePitch')?.value || 1),
+                        pitchVariation: parseFloat(document.getElementById('drumPitchVariation')?.value || 0)
                     };
+                    
                     this.generators.drums.start(drumParams, this.masterBus.getConnectionNodes());
                     break;
                 case 'glitch':
@@ -1258,17 +1269,6 @@ export class GenerativeSoundscape {
                         brightness: parseFloat(document.getElementById('additiveBrightness').value)
                     };
                     this.generators.additive.start(additiveParams, (node) => this.connectToMaster(node));
-                    break;
-                case 'sample':
-                    const sampleParams = {
-                        density: parseFloat(document.getElementById('sampleDensity').value) / 100,
-                        sample: document.getElementById('sampleSelect').value,
-                        pitch: parseFloat(document.getElementById('samplePitch').value),
-                        reverse: parseFloat(document.getElementById('sampleReverse').value) / 100 > 0.5,
-                        chop: parseFloat(document.getElementById('sampleChop').value) / 100,
-                        scatter: parseFloat(document.getElementById('sampleScatter').value) / 100
-                    };
-                    this.generators.sample.start(sampleParams, (node) => this.connectToMaster(node));
                     break;
             }
         }
@@ -1578,6 +1578,14 @@ export class GenerativeSoundscape {
             drumProbability.dispatchEvent(new Event('change'));
         }
         
+        // Randomly set use sample kit (only if samples are loaded)
+        const useSampleKit = document.getElementById('useSampleKit');
+        const drumKitStatus = document.getElementById('drumKitStatus');
+        if (useSampleKit && drumKitStatus && !drumKitStatus.textContent.includes('No samples')) {
+            useSampleKit.checked = Math.random() > 0.5; // 50% chance if samples loaded
+            useSampleKit.dispatchEvent(new Event('change'));
+        }
+        
         // Randomly select noise type
         const noiseTypes = ['white', 'pink', 'brown', 'crackle'];
         const noiseSelect = document.getElementById('noiseType');
@@ -1843,15 +1851,6 @@ export class GenerativeSoundscape {
         if (this.groupEnabled.vocal) {
             const vowels = ['a', 'e', 'i', 'o', 'u', 'ah', 'oo'];
             this.morphTargets.set('vocalVowel', vowels[Math.floor(Math.random() * vowels.length)]);
-        }
-        
-        // Random sample selection (only if sample player enabled)
-        if (this.groupEnabled.sample) {
-            const sampleSelect = document.getElementById('sampleSelect');
-            if (sampleSelect && sampleSelect.options.length > 0) {
-                const randomIndex = Math.floor(Math.random() * sampleSelect.options.length);
-                this.morphTargets.set('sampleSelect', sampleSelect.options[randomIndex].value);
-            }
         }
         
         // Random advanced drum settings (only if drums enabled)

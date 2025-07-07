@@ -362,6 +362,34 @@
                 <input type="range" id="drumHumanize" min="0" max="100" value="20">
                 <span class="value">20</span>
             </div>
+            <div class="control-group" style="border-top: 1px solid #333; padding-top: 10px; margin-top: 10px;">
+                <label>Load Drum Kit</label>
+                <input type="file" id="drumKitFileInput" accept="audio/*" multiple style="width: 100%;">
+            </div>
+            <div class="control-group">
+                <label>Status</label>
+                <div id="drumKitStatus" class="status-text">No samples loaded</div>
+            </div>
+            <div class="control-group">
+                <label>Use Sample Kit</label>
+                <input type="checkbox" id="useSampleKit">
+                <span class="info-text">Enable to use samples instead of synthesis</span>
+            </div>
+            <div class="control-group">
+                <label>Sample Pitch</label>
+                <input type="range" id="drumSamplePitch" min="0.5" max="2" value="1" step="0.05">
+                <span class="value">1</span>
+                <button class="lfo-button" data-param="drumSamplePitch">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Pitch Variation</label>
+                <input type="range" id="drumPitchVariation" min="0" max="100" value="0">
+                <span class="value">0</span>
+            </div>
+            <div id="sampleMappingDisplay" class="sample-mapping" style="display: none;">
+                <h3>Mapped Samples:</h3>
+                <div id="mappingList" class="mapping-list"></div>
+            </div>
         </div>
 
         <div class="section">
@@ -781,50 +809,6 @@
                 <input type="range" id="additiveBrightness" min="500" max="10000" value="5000">
                 <span class="value">5000</span>
                 <button class="lfo-button" data-param="additiveBrightness">MOD</button>
-            </div>
-        </div>
-        
-        <div class="section">
-            <h2><input type="checkbox" id="sampleEnable" class="group-enable" checked> Sample Player <span class="activity-indicator" id="sampleActivity"></span></h2>
-            <div class="control-group">
-                <label>Density</label>
-                <input type="range" id="sampleDensity" min="0" max="100" value="0">
-                <span class="value">0</span>
-                <button class="lfo-button" data-param="sampleDensity">MOD</button>
-            </div>
-            <div class="control-group">
-                <label>Sample</label>
-                <select id="sampleSelect">
-                    <option value="kick">Kick</option>
-                    <option value="snare">Snare</option>
-                    <option value="hihat">Hi-Hat</option>
-                    <option value="chord">Chord Stab</option>
-                    <option value="bass">Bass Hit</option>
-                </select>
-            </div>
-            <div class="control-group">
-                <label>Pitch</label>
-                <input type="range" id="samplePitch" min="0.25" max="4" value="1" step="0.05">
-                <span class="value">1</span>
-                <button class="lfo-button" data-param="samplePitch">MOD</button>
-            </div>
-            <div class="control-group">
-                <label>Reverse</label>
-                <input type="range" id="sampleReverse" min="0" max="100" value="0">
-                <span class="value">0</span>
-                <button class="lfo-button" data-param="sampleReverse">MOD</button>
-            </div>
-            <div class="control-group">
-                <label>Chop</label>
-                <input type="range" id="sampleChop" min="0" max="100" value="0">
-                <span class="value">0</span>
-                <button class="lfo-button" data-param="sampleChop">MOD</button>
-            </div>
-            <div class="control-group">
-                <label>Scatter</label>
-                <input type="range" id="sampleScatter" min="0" max="100" value="0">
-                <span class="value">0</span>
-                <button class="lfo-button" data-param="sampleScatter">MOD</button>
             </div>
         </div>
             </div>
