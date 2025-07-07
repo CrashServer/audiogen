@@ -74,6 +74,42 @@
         </div>
         
         <div class="section">
+            <h2>Global ADSR</h2>
+            <div class="control-group">
+                <label>Attack</label>
+                <input type="range" id="globalAttack" min="0.001" max="2" value="0.01" step="0.001">
+                <span class="value">0.01</span>
+                <button class="lfo-button" data-param="globalAttack">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Decay</label>
+                <input type="range" id="globalDecay" min="0.001" max="2" value="0.1" step="0.001">
+                <span class="value">0.1</span>
+                <button class="lfo-button" data-param="globalDecay">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Sustain</label>
+                <input type="range" id="globalSustain" min="0" max="1" value="0.7" step="0.01">
+                <span class="value">0.7</span>
+                <button class="lfo-button" data-param="globalSustain">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Release</label>
+                <input type="range" id="globalRelease" min="0.001" max="5" value="0.3" step="0.001">
+                <span class="value">0.3</span>
+                <button class="lfo-button" data-param="globalRelease">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>ADSR Mode</label>
+                <select id="adsrMode">
+                    <option value="global">Global</option>
+                    <option value="perGroup">Per Group</option>
+                    <option value="disabled">Disabled</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="section">
             <h2>Effects</h2>
             <div class="control-group">
                 <label>Compressor</label>
@@ -754,6 +790,34 @@
             </div>
         </div>
             </div>
+        </div>
+    </div>
+    
+    <div class="section automation-section" style="margin: 20px auto; max-width: 600px;">
+        <h2>Automation</h2>
+        <div class="control-group">
+            <button id="automationRecord" class="control-button">REC</button>
+            <button id="automationPlay" class="control-button">PLAY</button>
+            <button id="automationStop" class="control-button">STOP</button>
+            <button id="automationClear" class="control-button">CLEAR</button>
+        </div>
+        <div class="control-group">
+            <label>Loop</label>
+            <input type="checkbox" id="automationLoop" checked>
+        </div>
+        <div class="control-group">
+            <label>Automation Type</label>
+            <select id="automationType">
+                <option value="record">Record</option>
+                <option value="lfo">LFO Pattern</option>
+                <option value="random">Random</option>
+                <option value="curve">Custom Curve</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label>Duration</label>
+            <input type="range" id="automationDuration" min="1" max="60" value="10">
+            <span class="value">10</span>
         </div>
     </div>
 

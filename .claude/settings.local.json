@@ -12,7 +12,8 @@
       "Bash(chmod:*)",
       "Bash(find:*)",
       "Bash(npm run build:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(rg:*)"
     ],
     "deny": []
   }

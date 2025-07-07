@@ -8,11 +8,12 @@ export class SineBleepsGenerator {
         this.activeNodes = new Set();
     }
 
-    start(params, connectToMaster) {
+    start(params, connectToMaster, envelope = null) {
         if (this.isPlaying) return;
         
         const { density, range, duration } = params;
         this.masterConnection = connectToMaster;
+        this.envelope = envelope;
         
         if (density === 0) return;
         
@@ -66,11 +67,16 @@ export class SineBleepsGenerator {
             gain.gain.value = 0;
         }
         
-        // Sharp attack and release for Ikeda-style bleeps
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.5, now + 0.001);
-        gain.gain.setValueAtTime(0.5, now + duration - 0.001);
-        gain.gain.linearRampToValueAtTime(0, now + duration);
+        // Apply envelope if available, otherwise use default sharp bleeps
+        if (this.envelope) {
+            this.envelope.applyTo(gain.gain, now, now + duration);
+        } else {
+            // Sharp attack and release for Ikeda-style bleeps
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(0.5, now + 0.001);
+            gain.gain.setValueAtTime(0.5, now + duration - 0.001);
+            gain.gain.linearRampToValueAtTime(0, now + duration);
+        }
         
         osc.connect(gain);
         

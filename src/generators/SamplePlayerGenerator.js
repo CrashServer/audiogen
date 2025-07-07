@@ -7,9 +7,13 @@ export class SamplePlayerGenerator {
         this.voiceId = 'sample';
         this.activeVoices = new Set();
         this.sampleBuffers = new Map();
+        this.externalSamples = new Map();
         
         // Create built-in samples
         this.createBuiltInSamples();
+        
+        // Load external samples
+        this.loadExternalSamples();
     }
 
     createBuiltInSamples() {
@@ -118,7 +122,7 @@ export class SamplePlayerGenerator {
     }
 
     triggerSample(sampleName, pitchRatio, reverse, chopAmount) {
-        const buffer = this.sampleBuffers.get(sampleName);
+        const buffer = this.sampleBuffers.get(sampleName) || this.externalSamples.get(sampleName);
         if (!buffer) return;
         
         const now = this.audioContext.currentTime;
@@ -226,5 +230,89 @@ export class SamplePlayerGenerator {
 
     updateParameter(param, value) {
         // Parameters are handled in the start method
+    }
+    
+    async loadExternalSamples() {
+        try {
+            // Check if we're running from file:// protocol
+            if (window.location.protocol === 'file:') {
+                console.log('Running from file:// protocol - external samples disabled');
+                return;
+            }
+            
+            // Try to fetch the samples directory listing
+            const response = await fetch('/samples/');
+            if (response.ok) {
+                const text = await response.text();
+                // Parse directory listing for audio files
+                const audioExtensions = ['.wav', '.mp3', '.ogg', '.m4a', '.flac'];
+                const links = text.match(/href="([^"]+)"/g);
+                
+                if (links) {
+                    const audioFiles = links
+                        .map(link => link.match(/href="([^"]+)"/)[1])
+                        .filter(file => audioExtensions.some(ext => file.toLowerCase().endsWith(ext)));
+                    
+                    // Load each audio file
+                    for (const file of audioFiles) {
+                        try {
+                            const audioResponse = await fetch(`/samples/${file}`);
+                            if (audioResponse.ok) {
+                                const arrayBuffer = await audioResponse.arrayBuffer();
+                                const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+                                const sampleName = file.replace(/\.[^/.]+$/, ''); // Remove extension
+                                this.externalSamples.set(sampleName, audioBuffer);
+                                console.log(`Loaded external sample: ${sampleName}`);
+                            }
+                        } catch (err) {
+                            console.warn(`Failed to load sample ${file}:`, err);
+                        }
+                    }
+                }
+            }
+        } catch (err) {
+            console.warn('Could not load external samples:', err);
+        }
+        
+        // Update the UI with available samples
+        this.updateSampleList();
+    }
+    
+    updateSampleList() {
+        // Try to update the sample select dropdown if it exists
+        const sampleSelect = document.getElementById('sampleSelect');
+        if (sampleSelect) {
+            // Clear existing options
+            sampleSelect.innerHTML = '';
+            
+            // Add built-in samples
+            const builtInGroup = document.createElement('optgroup');
+            builtInGroup.label = 'Built-in';
+            for (const [name] of this.sampleBuffers) {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                builtInGroup.appendChild(option);
+            }
+            sampleSelect.appendChild(builtInGroup);
+            
+            // Add external samples if any
+            if (this.externalSamples.size > 0) {
+                const externalGroup = document.createElement('optgroup');
+                externalGroup.label = 'External';
+                for (const [name] of this.externalSamples) {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    externalGroup.appendChild(option);
+                }
+                sampleSelect.appendChild(externalGroup);
+            }
+            
+            // Set default selection
+            if (sampleSelect.options.length > 0) {
+                sampleSelect.selectedIndex = 0;
+            }
+        }
     }
 }

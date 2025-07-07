@@ -17,6 +17,8 @@ import { AdditiveSynthGenerator } from './generators/AdditiveSynthGenerator.js';
 import { SamplePlayerGenerator } from './generators/SamplePlayerGenerator.js';
 import { MasterBus } from './effects/MasterBus.js';
 import { PoolManager } from './utils/VoicePool.js';
+import { ADSREnvelope } from './utils/ADSREnvelope.js';
+import { AutomationRecorder } from './utils/AutomationRecorder.js';
 
 export class GenerativeSoundscape {
     constructor() {
@@ -83,6 +85,14 @@ export class GenerativeSoundscape {
         // Auto mode and lite mode
         this.autoModeInterval = null;
         this.liteMode = false;
+        
+        // ADSR envelope system
+        this.globalEnvelope = null;
+        this.adsrMode = 'global'; // 'global', 'perGroup', 'disabled'
+        this.groupEnvelopes = new Map();
+        
+        // Automation system
+        this.automationRecorder = null;
         
         // Initialize UI
         this.initializeUI();
@@ -425,6 +435,124 @@ export class GenerativeSoundscape {
             }
         });
         
+        // ADSR controls
+        addListener('globalAttack', 'input', (e) => {
+            const display = e.target.nextElementSibling;
+            if (display && display.classList.contains('value')) {
+                display.textContent = parseFloat(e.target.value).toFixed(3);
+            }
+            if (this.globalEnvelope) {
+                this.globalEnvelope.attack = parseFloat(e.target.value);
+            }
+        });
+        
+        addListener('globalDecay', 'input', (e) => {
+            const display = e.target.nextElementSibling;
+            if (display && display.classList.contains('value')) {
+                display.textContent = parseFloat(e.target.value).toFixed(3);
+            }
+            if (this.globalEnvelope) {
+                this.globalEnvelope.decay = parseFloat(e.target.value);
+            }
+        });
+        
+        addListener('globalSustain', 'input', (e) => {
+            const display = e.target.nextElementSibling;
+            if (display && display.classList.contains('value')) {
+                display.textContent = parseFloat(e.target.value).toFixed(2);
+            }
+            if (this.globalEnvelope) {
+                this.globalEnvelope.sustain = parseFloat(e.target.value);
+            }
+        });
+        
+        addListener('globalRelease', 'input', (e) => {
+            const display = e.target.nextElementSibling;
+            if (display && display.classList.contains('value')) {
+                display.textContent = parseFloat(e.target.value).toFixed(3);
+            }
+            if (this.globalEnvelope) {
+                this.globalEnvelope.release = parseFloat(e.target.value);
+            }
+        });
+        
+        addListener('adsrMode', 'change', (e) => {
+            this.adsrMode = e.target.value;
+            // Reinitialize generators if playing to apply new ADSR mode
+            if (this.isPlaying) {
+                Object.keys(this.groupEnabled).forEach(group => {
+                    if (this.groupEnabled[group]) {
+                        this.updateGroupState(group, false);
+                        this.updateGroupState(group, true);
+                    }
+                });
+            }
+        });
+        
+        // Automation controls
+        addListener('automationRecord', 'click', () => {
+            if (!this.automationRecorder) return;
+            
+            const button = document.getElementById('automationRecord');
+            if (this.automationRecorder.isRecording) {
+                this.automationRecorder.stopRecording();
+                button.classList.remove('recording');
+                button.textContent = 'REC';
+            } else {
+                this.automationRecorder.startRecording();
+                button.classList.add('recording');
+                button.textContent = 'STOP REC';
+            }
+        });
+        
+        addListener('automationPlay', 'click', () => {
+            if (!this.automationRecorder) return;
+            
+            const button = document.getElementById('automationPlay');
+            if (this.automationRecorder.isPlaying) {
+                this.automationRecorder.stopPlayback();
+                button.classList.remove('active');
+            } else {
+                // Callback to update parameters during playback
+                this.automationRecorder.startPlayback((paramId, value) => {
+                    const control = document.getElementById(paramId);
+                    if (control) {
+                        control.value = value;
+                        control.dispatchEvent(new Event('input'));
+                    }
+                });
+                button.classList.add('active');
+            }
+        });
+        
+        addListener('automationStop', 'click', () => {
+            if (!this.automationRecorder) return;
+            
+            this.automationRecorder.stopPlayback();
+            this.automationRecorder.stopRecording();
+            
+            document.getElementById('automationRecord').classList.remove('recording');
+            document.getElementById('automationRecord').textContent = 'REC';
+            document.getElementById('automationPlay').classList.remove('active');
+        });
+        
+        addListener('automationClear', 'click', () => {
+            if (!this.automationRecorder) return;
+            this.automationRecorder.clearRecordings();
+        });
+        
+        addListener('automationLoop', 'change', (e) => {
+            if (!this.automationRecorder) return;
+            this.automationRecorder.setLoop(e.target.checked);
+        });
+        
+        addListener('automationDuration', 'input', (e) => {
+            const display = e.target.nextElementSibling;
+            if (display && display.classList.contains('value')) {
+                display.textContent = e.target.value;
+            }
+        });
+        
         // Group toggles
         document.querySelectorAll('.group-enable').forEach(toggle => {
             toggle.addEventListener('change', (e) => {
@@ -489,6 +617,11 @@ export class GenerativeSoundscape {
                         this.updateParameter(control.id, parseFloat(control.value));
                     }
                 }
+                
+                // Record automation if enabled
+                if (this.automationRecorder && this.automationRecorder.isRecording && control.type === 'range') {
+                    this.automationRecorder.recordValue(control.id, parseFloat(control.value));
+                }
             });
         });
         
@@ -509,6 +642,18 @@ export class GenerativeSoundscape {
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             // Initialize pool manager when audio context is created
             this.poolManager = new PoolManager(this.audioContext);
+            
+            // Initialize global ADSR envelope
+            this.globalEnvelope = new ADSREnvelope(this.audioContext);
+            this.globalEnvelope.setADSR(
+                parseFloat(document.getElementById('globalAttack')?.value || 0.01),
+                parseFloat(document.getElementById('globalDecay')?.value || 0.1),
+                parseFloat(document.getElementById('globalSustain')?.value || 0.7),
+                parseFloat(document.getElementById('globalRelease')?.value || 0.3)
+            );
+            
+            // Initialize automation recorder
+            this.automationRecorder = new AutomationRecorder(this.audioContext);
         }
         
         this.isPlaying = true;
@@ -712,7 +857,7 @@ export class GenerativeSoundscape {
                 range: parseFloat(document.getElementById('bleepRange').value),
                 duration: parseFloat(document.getElementById('bleepDuration').value)
             };
-            this.generators.bleeps.start(bleepsParams, (node) => this.connectToMaster(node));
+            this.generators.bleeps.start(bleepsParams, (node) => this.connectToMaster(node), this.getEnvelopeForGroup('bleeps'));
         }
         
         // Start data burst if enabled
@@ -943,7 +1088,7 @@ export class GenerativeSoundscape {
                         range: parseFloat(document.getElementById('bleepRange').value),
                         duration: parseFloat(document.getElementById('bleepDuration').value)
                     };
-                    this.generators.bleeps.start(bleepsParams, (node) => this.connectToMaster(node));
+                    this.generators.bleeps.start(bleepsParams, (node) => this.connectToMaster(node), this.getEnvelopeForGroup('bleeps'));
                     break;
                 case 'burst':
                     const burstParams = {
@@ -2436,6 +2581,14 @@ Press any key to close this help.`;
             }
         });
         
+        // Get checkboxes (non-group enables)
+        settings.checkboxes = {};
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            if (checkbox.id && !checkbox.classList.contains('group-enable')) {
+                settings.checkboxes[checkbox.id] = checkbox.checked;
+            }
+        });
+        
         // Encode settings as base64
         const settingsJSON = JSON.stringify(settings);
         const encoded = btoa(settingsJSON);
@@ -2507,11 +2660,44 @@ Press any key to close this help.`;
                     });
                 }
                 
+                // Apply checkboxes
+                if (settings.checkboxes) {
+                    Object.entries(settings.checkboxes).forEach(([id, checked]) => {
+                        const checkbox = document.getElementById(id);
+                        if (checkbox) {
+                            checkbox.checked = checked;
+                            checkbox.dispatchEvent(new Event('change'));
+                        }
+                    });
+                }
+                
                 console.log('Settings loaded from URL');
             } catch (err) {
                 console.error('Failed to load settings from URL:', err);
             }
         }
+    }
+    
+    getEnvelopeForGroup(groupName) {
+        if (this.adsrMode === 'disabled') {
+            return null;
+        }
+        
+        if (this.adsrMode === 'perGroup') {
+            // Create per-group envelope if it doesn't exist
+            if (!this.groupEnvelopes.has(groupName)) {
+                const envelope = new ADSREnvelope(this.audioContext);
+                // Copy global envelope settings as default
+                if (this.globalEnvelope) {
+                    envelope.setParameters(this.globalEnvelope.getParameters());
+                }
+                this.groupEnvelopes.set(groupName, envelope);
+            }
+            return this.groupEnvelopes.get(groupName);
+        }
+        
+        // Default to global envelope
+        return this.globalEnvelope;
     }
 }
 

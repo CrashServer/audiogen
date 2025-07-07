@@ -76,7 +76,7 @@ export class KarplusStrongGenerator {
         feedback.gain.value = damping;
         
         const output = this.audioContext.createGain();
-        output.gain.value = 0.5;
+        output.gain.value = 0.3;
         
         // Connect the feedback loop
         noise.connect(delay);

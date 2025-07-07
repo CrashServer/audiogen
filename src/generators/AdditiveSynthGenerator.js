@@ -87,7 +87,7 @@ export class AdditiveSynthGenerator {
             }
             
             // Amplitude based on harmonic number with decay
-            const amplitude = 0.5 / Math.pow(harmonic, decay);
+            const amplitude = 0.25 / Math.pow(harmonic, decay);
             
             // Envelope
             gain.gain.setValueAtTime(0, now);
