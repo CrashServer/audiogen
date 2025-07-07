@@ -37,8 +37,8 @@ export class NoiseGenerator {
         this.nodes.filter.type = 'lowpass';
         this.nodes.filter.frequency.value = filterFreq;
         
-        // Set gain
-        this.nodes.gain.gain.value = level * 0.3;
+        // Set gain - reduced for noise
+        this.nodes.gain.gain.value = level * 0.1;
         
         // Connect chain
         this.nodes.source.connect(this.nodes.filter);
@@ -99,7 +99,7 @@ export class NoiseGenerator {
                     const white = Math.random() * 2 - 1;
                     data[i] = (lastOut + (0.02 * white)) / 1.02;
                     lastOut = data[i];
-                    data[i] *= 3.5; // Boost brown noise
+                    data[i] *= 2.0; // Reduced boost for brown noise
                 }
                 break;
                 
@@ -115,7 +115,7 @@ export class NoiseGenerator {
         switch(param) {
             case 'level':
                 if (this.nodes.gain) {
-                    this.nodes.gain.gain.value = value * 0.3;
+                    this.nodes.gain.gain.value = value * 0.1;
                 }
                 break;
             case 'filter':

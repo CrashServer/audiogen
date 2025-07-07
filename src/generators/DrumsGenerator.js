@@ -29,13 +29,13 @@ export class DrumsGenerator {
             
             // Kick
             if (currentPattern.kick[patternStep] && Math.random() < density) {
-                const velocity = currentPattern.kick[patternStep] * 0.9;
+                const velocity = currentPattern.kick[patternStep] * 1.2;
                 setTimeout(() => this.playKick(this.audioContext.currentTime, variation, velocity), microTiming);
             }
             
             // Snare with rush
             if (currentPattern.snare[patternStep] && Math.random() < density * 0.9) {
-                const velocity = currentPattern.snare[patternStep] * 0.8;
+                const velocity = currentPattern.snare[patternStep] * 1.1;
                 setTimeout(() => {
                     this.playSnare(this.audioContext.currentTime, variation, velocity);
                     if (Math.random() < snareRush && patternStep % 4 === 0) {
@@ -46,7 +46,7 @@ export class DrumsGenerator {
             
             // Hi-hat
             if (step % (16 / hihatSpeed) === 0 && currentPattern.hihat[patternStep % 16] && Math.random() < density * 0.8) {
-                const velocity = currentPattern.hihat[patternStep % 16] * 0.5;
+                const velocity = currentPattern.hihat[patternStep % 16] * 0.8;
                 const isOpen = (patternStep % 4 === 2) && Math.random() < 0.3;
                 setTimeout(() => this.playHiHat(this.audioContext.currentTime, variation, velocity, isOpen), microTiming);
             }
@@ -67,11 +67,11 @@ export class DrumsGenerator {
                 setTimeout(() => {
                     const drumType = Math.random();
                     if (drumType < 0.4) {
-                        this.playKick(this.audioContext.currentTime, variation * 2, 0.3);
+                        this.playKick(this.audioContext.currentTime, variation * 2, 0.5);
                     } else if (drumType < 0.7) {
-                        this.playSnare(this.audioContext.currentTime, variation * 2, 0.25);
+                        this.playSnare(this.audioContext.currentTime, variation * 2, 0.4);
                     } else {
-                        this.playHiHat(this.audioContext.currentTime, variation * 2, 0.2);
+                        this.playHiHat(this.audioContext.currentTime, variation * 2, 0.35);
                     }
                 }, ghostTime);
             }
@@ -170,7 +170,7 @@ export class DrumsGenerator {
         }
     }
 
-    playKick(time, variation, velocity = 0.7) {
+    playKick(time, variation, velocity = 1.0) {
         if (this.drumVoices >= this.maxDrumVoices || this.activeVoices > this.maxVoices) return;
         this.drumVoices++;
         this.activeVoices++;
@@ -189,7 +189,7 @@ export class DrumsGenerator {
         sub.frequency.exponentialRampToValueAtTime(25, time + 0.3);
         
         const subGain = this.audioContext.createGain();
-        subGain.gain.setValueAtTime(0.7, time);
+        subGain.gain.setValueAtTime(1.0, time);
         subGain.gain.exponentialRampToValueAtTime(0.01, time + 0.25);
         
         // Body
@@ -199,7 +199,7 @@ export class DrumsGenerator {
         body.frequency.exponentialRampToValueAtTime(45, time + 0.08);
         
         const bodyGain = this.audioContext.createGain();
-        bodyGain.gain.setValueAtTime(0.5, time);
+        bodyGain.gain.setValueAtTime(0.8, time);
         bodyGain.gain.exponentialRampToValueAtTime(0.01, time + 0.1);
         
         // Click
@@ -208,7 +208,7 @@ export class DrumsGenerator {
         click.frequency.value = 1500 + Math.random() * 500;
         
         const clickGain = this.audioContext.createGain();
-        clickGain.gain.setValueAtTime(0.3, time);
+        clickGain.gain.setValueAtTime(0.5, time);
         clickGain.gain.exponentialRampToValueAtTime(0.01, time + 0.005);
         
         const clickFilter = this.audioContext.createBiquadFilter();
@@ -226,7 +226,7 @@ export class DrumsGenerator {
         noiseSource.buffer = noiseBuffer;
         
         const noiseGain = this.audioContext.createGain();
-        noiseGain.gain.value = 0.2;
+        noiseGain.gain.value = 0.3;
         
         // EQ
         const eq = this.audioContext.createBiquadFilter();
@@ -268,7 +268,7 @@ export class DrumsGenerator {
         }, 300);
     }
 
-    playSnare(time, variation, velocity = 0.5) {
+    playSnare(time, variation, velocity = 0.8) {
         if (this.drumVoices >= this.maxDrumVoices || this.activeVoices > this.maxVoices) return;
         this.drumVoices++;
         this.activeVoices++;
@@ -307,7 +307,7 @@ export class DrumsGenerator {
         bpf.Q.value = 2;
         
         const noiseGain = this.audioContext.createGain();
-        noiseGain.gain.setValueAtTime(0.7, time);
+        noiseGain.gain.setValueAtTime(1.0, time);
         noiseGain.gain.exponentialRampToValueAtTime(0.01, time + noiseLength);
         
         // Tonal components
@@ -318,7 +318,7 @@ export class DrumsGenerator {
             osc.frequency.value = freq * (1 + variation * 0.1);
             
             const gain = this.audioContext.createGain();
-            gain.gain.setValueAtTime(0.3 / fundamentals.length, time);
+            gain.gain.setValueAtTime(0.5 / fundamentals.length, time);
             gain.gain.exponentialRampToValueAtTime(0.01, time + 0.03 + index * 0.01);
             
             osc.connect(gain);
@@ -334,7 +334,7 @@ export class DrumsGenerator {
         click.frequency.value = 1000;
         
         const clickGain = this.audioContext.createGain();
-        clickGain.gain.setValueAtTime(0.5, time);
+        clickGain.gain.setValueAtTime(0.7, time);
         clickGain.gain.exponentialRampToValueAtTime(0.01, time + 0.002);
         
         // Connect
@@ -359,7 +359,7 @@ export class DrumsGenerator {
         }, 150);
     }
 
-    playHiHat(time, variation, velocity = 0.3, isOpen = false) {
+    playHiHat(time, variation, velocity = 0.5, isOpen = false) {
         if (this.drumVoices >= this.maxDrumVoices || this.activeVoices > this.maxVoices) return;
         this.drumVoices++;
         this.activeVoices++;
