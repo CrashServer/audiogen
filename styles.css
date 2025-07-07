@@ -31,13 +31,19 @@ h1 {
 }
 
 h2 {
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
     color: #fff;
-    font-size: 0.8rem;
-    letter-spacing: 0.2em;
+    font-size: 0.9rem;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-    font-weight: 400;
-    opacity: 0.8;
+    font-weight: 500;
+    opacity: 0.9;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 0.5rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .main-controls {
@@ -49,16 +55,17 @@ h2 {
 
 .control-button {
     padding: 0.8rem 2rem;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     background: transparent;
     color: #fff;
     border: 1px solid #fff;
     border-radius: 0;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-weight: 300;
+    font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.15em;
+    min-width: 120px;
 }
 
 .control-button:hover:not(:disabled) {
@@ -103,12 +110,67 @@ h2 {
     100% { opacity: 1; }
 }
 
+.secondary-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.control-button.small {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.7rem;
+    min-width: 80px;
+}
+
+.control-button.active {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+}
+
+.control-button.secondary.active {
+    background: #666;
+    color: #000;
+    border-color: #666;
+}
+
 .section {
     background: transparent;
-    border: 1px solid #222;
-    padding: 1rem;
-    margin-bottom: 1rem;
+    border: 1px solid #333;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
     position: relative;
+    transition: border-color 0.3s ease;
+}
+
+.section:hover {
+    border-color: #444;
+}
+
+.section.active {
+    border-color: #0f0;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+}
+
+.activity-indicator {
+    width: 8px;
+    height: 8px;
+    background: #333;
+    border-radius: 50%;
+    margin-left: auto;
+    transition: all 0.3s ease;
+}
+
+.activity-indicator.active {
+    background: #0f0;
+    box-shadow: 0 0 8px #0f0;
+    animation: pulse-indicator 1s ease-in-out infinite;
+}
+
+@keyframes pulse-indicator {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
 }
 
 .control-group {
@@ -129,10 +191,11 @@ h2 {
 }
 
 label {
-    font-size: 0.65rem;
-    color: #999;
+    font-size: 0.7rem;
+    color: #bbb;
     text-transform: uppercase;
     letter-spacing: 0.1em;
+    font-weight: 400;
 }
 
 input[type="range"] {
@@ -147,36 +210,53 @@ input[type="range"] {
 }
 
 input[type="range"].animated {
-    background: linear-gradient(90deg, #0f0 0%, #333 50%, #0f0 100%);
-    background-size: 200% 100%;
-    animation: slide 2s linear infinite;
+    background: linear-gradient(90deg, #0f0 0%, #333 25%, #0f0 50%, #333 75%, #0f0 100%);
+    background-size: 400% 100%;
+    animation: slide 3s linear infinite;
+    box-shadow: 0 0 10px #0f0;
 }
 
 input[type="range"].random-jump {
     background: linear-gradient(90deg, #f0f 0%, #333 50%, #f0f 100%);
     background-size: 200% 100%;
-    animation: pulse 0.5s ease-in-out infinite;
+    animation: pulse 0.3s ease-in-out infinite, glow 0.3s ease-in-out infinite;
 }
 
 input[type="range"].other-mod {
-    background: linear-gradient(90deg, #0ff 0%, #333 50%, #0ff 100%);
-    background-size: 200% 100%;
-    animation: step 0.4s steps(8) infinite;
+    background: linear-gradient(90deg, #0ff 0%, #333 12.5%, #0ff 25%, #333 37.5%, #0ff 50%, #333 62.5%, #0ff 75%, #333 87.5%, #0ff 100%);
+    background-size: 800% 100%;
+    animation: step 3.2s steps(8) infinite;
+    box-shadow: 0 0 5px #0ff;
 }
 
 @keyframes slide {
     0% { background-position: 0% 0%; }
-    100% { background-position: 200% 0%; }
+    100% { background-position: 400% 0%; }
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+    0%, 100% { 
+        opacity: 1; 
+        filter: brightness(1.2);
+    }
+    50% { 
+        opacity: 0.6; 
+        filter: brightness(0.8);
+    }
+}
+
+@keyframes glow {
+    0%, 100% { 
+        box-shadow: 0 0 5px #f0f, 0 0 10px #f0f;
+    }
+    50% { 
+        box-shadow: 0 0 20px #f0f, 0 0 30px #f0f;
+    }
 }
 
 @keyframes step {
     0% { background-position: 0% 0%; }
-    100% { background-position: 200% 0%; }
+    100% { background-position: 800% 0%; }
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -194,6 +274,21 @@ input[type="range"]::-webkit-slider-thumb:hover {
     transform: scale(1.5);
 }
 
+input[type="range"].animated::-webkit-slider-thumb {
+    background: #0f0;
+    box-shadow: 0 0 10px #0f0;
+}
+
+input[type="range"].random-jump::-webkit-slider-thumb {
+    background: #f0f;
+    box-shadow: 0 0 10px #f0f;
+}
+
+input[type="range"].other-mod::-webkit-slider-thumb {
+    background: #0ff;
+    box-shadow: 0 0 10px #0ff;
+}
+
 input[type="range"]::-moz-range-thumb {
     width: 12px;
     height: 12px;
@@ -206,6 +301,21 @@ input[type="range"]::-moz-range-thumb {
 
 input[type="range"]::-moz-range-thumb:hover {
     transform: scale(1.5);
+}
+
+input[type="range"].animated::-moz-range-thumb {
+    background: #0f0;
+    box-shadow: 0 0 10px #0f0;
+}
+
+input[type="range"].random-jump::-moz-range-thumb {
+    background: #f0f;
+    box-shadow: 0 0 10px #f0f;
+}
+
+input[type="range"].other-mod::-moz-range-thumb {
+    background: #0ff;
+    box-shadow: 0 0 10px #0ff;
 }
 
 .value {

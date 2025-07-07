@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>musisum</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>musisum</h1>
+        
+        <div class="main-controls">
+            <button id="playButton" class="control-button">▶ Play</button>
+            <button id="stopButton" class="control-button" disabled>■ Stop</button>
+            <button id="randomizeButton" class="control-button secondary">🎲 Randomize</button>
+            <button id="morphButton" class="control-button secondary">〰️ Morph</button>
+            <button id="recordButton" class="control-button record">⏺ Record</button>
+        </div>
+
+        <div class="columns-container">
+            <div class="column">
+                <div class="section">
+            <h2>Master</h2>
+            <div class="control-group">
+                <label>Volume</label>
+                <input type="range" id="masterVolume" min="0" max="100" value="50">
+                <span class="value">50</span>
+            </div>
+            <div class="control-group">
+                <label>Reverb</label>
+                <input type="range" id="reverb" min="0" max="100" value="20">
+                <span class="value">20</span>
+                <button class="lfo-button" data-param="reverb">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Delay</label>
+                <input type="range" id="delay" min="0" max="100" value="0">
+                <span class="value">0</span>
+                <button class="lfo-button" data-param="delay">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Delay Time</label>
+                <input type="range" id="delayTime" min="0.1" max="1" value="0.3" step="0.05">
+                <span class="value">0.3</span>
+            </div>
+            <div class="control-group">
+                <label>Morph Time</label>
+                <input type="range" id="morphTime" min="1" max="30" value="5">
+                <span class="value">5</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><input type="checkbox" id="droneEnable" class="group-enable" checked> Drone</h2>
+            <div class="control-group">
+                <label>Frequency</label>
+                <input type="range" id="droneFreq" min="50" max="500" value="110">
+                <span class="value">110</span>
+                <button class="lfo-button" data-param="droneFreq">LFO</button>
+            </div>
+            <div class="control-group">
+                <label>Detune</label>
+                <input type="range" id="droneDetune" min="0" max="50" value="5">
+                <span class="value">5</span>
+                <button class="lfo-button" data-param="droneDetune">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Voices</label>
+                <input type="range" id="droneVoices" min="1" max="4" value="2">
+                <span class="value">2</span>
+            </div>
+            <div class="control-group">
+                <label>Filter Cutoff</label>
+                <input type="range" id="droneFilter" min="100" max="5000" value="1000">
+                <span class="value">1000</span>
+                <button class="lfo-button" data-param="droneFilter">LFO</button>
+            </div>
+            <div class="control-group">
+                <label>LFO Speed</label>
+                <input type="range" id="droneLFO" min="0" max="10" value="0" step="0.1">
+                <span class="value">0</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><input type="checkbox" id="glitchEnable" class="group-enable" checked> Glitch</h2>
+            <div class="control-group">
+                <label>Intensity</label>
+                <input type="range" id="glitchIntensity" min="0" max="100" value="0">
+                <span class="value">0</span>
+                <button class="lfo-button" data-param="glitchIntensity">LFO</button>
+            </div>
+            <div class="control-group">
+                <label>Rate</label>
+                <input type="range" id="glitchRate" min="0.1" max="20" value="5" step="0.1">
+                <span class="value">5.0</span>
+                <button class="lfo-button" data-param="glitchRate">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Bit Crush</label>
+                <input type="range" id="bitCrush" min="1" max="16" value="16">
+                <span class="value">16</span>
+                <button class="lfo-button" data-param="bitCrush">LFO</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><input type="checkbox" id="drumsEnable" class="group-enable" checked> Drums</h2>
+            <div class="control-group">
+                <label>Pattern</label>
+                <select id="drumPattern">
+                    <option value="techno">Techno</option>
+                    <option value="breakbeat">Breakbeat</option>
+                    <option value="jungle">Jungle</option>
+                    <option value="idm">IDM</option>
+                    <option value="gabber">Gabber</option>
+                    <option value="trap">Trap</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Tempo</label>
+                <input type="range" id="drumTempo" min="60" max="200" value="120">
+                <span class="value">120</span>
+                <button class="lfo-button" data-param="drumTempo">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Density</label>
+                <input type="range" id="drumDensity" min="0" max="100" value="30">
+                <span class="value">30</span>
+                <button class="lfo-button" data-param="drumDensity">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Variation</label>
+                <input type="range" id="drumVariation" min="0" max="100" value="30">
+                <span class="value">30</span>
+            </div>
+            <div class="control-group">
+                <label>Swing</label>
+                <input type="range" id="drumSwing" min="0" max="100" value="0">
+                <span class="value">0</span>
+                <button class="lfo-button" data-param="drumSwing">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Snare Rush</label>
+                <input type="range" id="snareRush" min="0" max="50" value="0">
+                <span class="value">0</span>
+            </div>
+            <div class="control-group">
+                <label>Ghost Notes</label>
+                <input type="range" id="ghostNotes" min="0" max="50" value="0">
+                <span class="value">0</span>
+            </div>
+            <div class="control-group">
+                <label>Hi-Hat Speed</label>
+                <input type="range" id="hihatSpeed" min="1" max="8" value="1">
+                <span class="value">1</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><input type="checkbox" id="bleepsEnable" class="group-enable" checked> Sine Bleeps</h2>
+            <div class="control-group">
+                <label>Density</label>
+                <input type="range" id="bleepDensity" min="0" max="100" value="0">
+                <span class="value">0</span>
+            </div>
+            <div class="control-group">
+                <label>Frequency Range</label>
+                <input type="range" id="bleepRange" min="100" max="10000" value="2000">
+                <span class="value">2000</span>
+                <button class="lfo-button" data-param="bleepRange">LFO</button>
+            </div>
+            <div class="control-group">
+                <label>Duration</label>
+                <input type="range" id="bleepDuration" min="0.01" max="0.5" value="0.05" step="0.01">
+                <span class="value">0.05</span>
+                <button class="lfo-button" data-param="bleepDuration">MOD</button>
+            </div>
+        </div>
+            </div>
+            
+            <div class="column">
+        <div class="section">
+            <h2><input type="checkbox" id="burstEnable" class="group-enable" checked> Data Burst</h2>
+            <div class="control-group">
+                <label>Activity</label>
+                <input type="range" id="burstActivity" min="0" max="100" value="0">
+                <span class="value">0</span>
+                <button class="lfo-button" data-param="burstActivity">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Complexity</label>
+                <input type="range" id="burstComplexity" min="1" max="10" value="3">
+                <span class="value">3</span>
+            </div>
+            <div class="control-group">
+                <label>Speed</label>
+                <input type="range" id="burstSpeed" min="0.1" max="10" value="2" step="0.1">
+                <span class="value">2.0</span>
+                <button class="lfo-button" data-param="burstSpeed">MOD</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><input type="checkbox" id="fmEnable" class="group-enable" checked> FM Synthesis</h2>
+            <div class="control-group">
+                <label>Carrier Freq</label>
+                <input type="range" id="fmCarrier" min="50" max="1000" value="200">
+                <span class="value">200</span>
+                <button class="lfo-button" data-param="fmCarrier">LFO</button>
+            </div>
+            <div class="control-group">
+                <label>Modulation Index</label>
+                <input type="range" id="fmIndex" min="0" max="100" value="0">
+                <span class="value">0</span>
+                <button class="lfo-button" data-param="fmIndex">LFO</button>
+            </div>
+            <div class="control-group">
+                <label>Mod Ratio</label>
+                <input type="range" id="fmRatio" min="0.1" max="10" value="2" step="0.1">
+                <span class="value">2.0</span>
+                <button class="lfo-button" data-param="fmRatio">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>FM LFO</label>
+                <input type="range" id="fmLFO" min="0" max="20" value="0" step="0.1">
+                <span class="value">0</span>
+            </div>
+        </div>
+            </div>
+            
+            <div class="column">
+        <div class="section">
+            <h2><input type="checkbox" id="acidEnable" class="group-enable" checked> Acid/303</h2>
+            <div class="control-group">
+                <label>Level</label>
+                <input type="range" id="acidLevel" min="0" max="100" value="0">
+                <span class="value">0</span>
+            </div>
+            <div class="control-group">
+                <label>Base Freq</label>
+                <input type="range" id="acidFreq" min="50" max="500" value="100">
+                <span class="value">100</span>
+                <button class="lfo-button" data-param="acidFreq">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Resonance</label>
+                <input type="range" id="acidResonance" min="0" max="100" value="50">
+                <span class="value">50</span>
+                <button class="lfo-button" data-param="acidResonance">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Decay</label>
+                <input type="range" id="acidDecay" min="0.1" max="2" value="0.5" step="0.1">
+                <span class="value">0.5</span>
+            </div>
+            <div class="control-group">
+                <label>Pattern Speed</label>
+                <input type="range" id="acidSpeed" min="0.5" max="4" value="1" step="0.5">
+                <span class="value">1.0</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><input type="checkbox" id="granularEnable" class="group-enable" checked> Granular</h2>
+            <div class="control-group">
+                <label>Density</label>
+                <input type="range" id="grainDensity" min="0" max="50" value="0">
+                <span class="value">0</span>
+                <button class="lfo-button" data-param="grainDensity">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Grain Size</label>
+                <input type="range" id="grainSize" min="10" max="500" value="50">
+                <span class="value">50</span>
+                <button class="lfo-button" data-param="grainSize">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Pitch Spread</label>
+                <input type="range" id="grainPitch" min="0" max="100" value="50">
+                <span class="value">50</span>
+                <button class="lfo-button" data-param="grainPitch">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Pan Spread</label>
+                <input type="range" id="grainPan" min="0" max="100" value="50">
+                <span class="value">50</span>
+            </div>
+        </div>
+        <div class="section">
+            <h2><input type="checkbox" id="noiseEnable" class="group-enable" checked> Noise Textures</h2>
+            <div class="control-group">
+                <label>Type</label>
+                <select id="noiseType">
+                    <option value="white">White</option>
+                    <option value="pink">Pink</option>
+                    <option value="brown">Brown</option>
+                    <option value="crackle">Crackle</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Level</label>
+                <input type="range" id="noiseLevel" min="0" max="100" value="0">
+                <span class="value">0</span>
+                <button class="lfo-button" data-param="noiseLevel">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Filter Freq</label>
+                <input type="range" id="noiseFilter" min="100" max="10000" value="5000">
+                <span class="value">5000</span>
+                <button class="lfo-button" data-param="noiseFilter">LFO</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2><input type="checkbox" id="spaceMelodyEnable" class="group-enable" checked> Space Melody</h2>
+            <div class="control-group">
+                <label>Density</label>
+                <input type="range" id="spaceMelodyDensity" min="0" max="100" value="0">
+                <span class="value">0</span>
+                <button class="lfo-button" data-param="spaceMelodyDensity">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Note Range</label>
+                <input type="range" id="spaceMelodyRange" min="1" max="4" value="2">
+                <span class="value">2</span>
+            </div>
+            <div class="control-group">
+                <label>Speed</label>
+                <input type="range" id="spaceMelodySpeed" min="0.1" max="4" value="1" step="0.1">
+                <span class="value">1.0</span>
+                <button class="lfo-button" data-param="spaceMelodySpeed">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Echo</label>
+                <input type="range" id="spaceMelodyEcho" min="0" max="100" value="50">
+                <span class="value">50</span>
+                <button class="lfo-button" data-param="spaceMelodyEcho">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Portamento</label>
+                <input type="range" id="spaceMelodyPortamento" min="0" max="500" value="50">
+                <span class="value">50</span>
+                <button class="lfo-button" data-param="spaceMelodyPortamento">MOD</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2><input type="checkbox" id="ambientPadEnable" class="group-enable" checked> Ambient Pad</h2>
+            <div class="control-group">
+                <label>Density</label>
+                <input type="range" id="padDensity" min="0" max="100" value="0">
+                <span class="value">0</span>
+            </div>
+            <div class="control-group">
+                <label>Attack</label>
+                <input type="range" id="padAttack" min="0.5" max="10" value="3" step="0.5">
+                <span class="value">3.0</span>
+            </div>
+            <div class="control-group">
+                <label>Release</label>
+                <input type="range" id="padRelease" min="0.5" max="10" value="5" step="0.5">
+                <span class="value">5.0</span>
+            </div>
+            <div class="control-group">
+                <label>Filter Sweep</label>
+                <input type="range" id="padFilterSweep" min="0" max="100" value="50">
+                <span class="value">50</span>
+                <button class="lfo-button" data-param="padFilterSweep">LFO</button>
+            </div>
+            <div class="control-group">
+                <label>Shimmer</label>
+                <input type="range" id="padShimmer" min="0" max="100" value="0">
+                <span class="value">0</span>
+                <button class="lfo-button" data-param="padShimmer">MOD</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2><input type="checkbox" id="arpeggiatorEnable" class="group-enable" checked> Arpeggiator</h2>
+            <div class="control-group">
+                <label>Enable</label>
+                <input type="range" id="arpEnable" min="0" max="100" value="0">
+                <span class="value">0</span>
+            </div>
+            <div class="control-group">
+                <label>Pattern</label>
+                <select id="arpPattern">
+                    <option value="up">Up</option>
+                    <option value="down">Down</option>
+                    <option value="updown">Up/Down</option>
+                    <option value="random">Random</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Speed</label>
+                <input type="range" id="arpSpeed" min="1" max="16" value="8">
+                <span class="value">8</span>
+                <button class="lfo-button" data-param="arpSpeed">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Octaves</label>
+                <input type="range" id="arpOctaves" min="1" max="4" value="2">
+                <span class="value">2</span>
+            </div>
+            <div class="control-group">
+                <label>Gate</label>
+                <input type="range" id="arpGate" min="10" max="90" value="50">
+                <span class="value">50</span>
+                <button class="lfo-button" data-param="arpGate">MOD</button>
+            </div>
+        </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.bundle.js"></script>
+</body>
+</html>
