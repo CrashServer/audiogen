@@ -1,5 +1,6 @@
 import { DroneGenerator } from './generators/DroneGenerator.js';
 import { DrumsGenerator } from './generators/DrumsGenerator.js';
+import { AdvancedDrumsGenerator } from './generators/AdvancedDrumsGenerator.js';
 import { GlitchGenerator } from './generators/GlitchGenerator.js';
 import { SineBleepsGenerator } from './generators/SineBleepsGenerator.js';
 import { DataBurstGenerator } from './generators/DataBurstGenerator.js';
@@ -489,6 +490,15 @@ export class GenerativeSoundscape {
             }
         });
         
+        // Drum pattern mode change
+        addListener('drumPatternMode', 'change', (e) => {
+            // Restart drums if playing to apply new pattern mode
+            if (this.isPlaying && this.groupEnabled.drums) {
+                this.updateGroupState('drums', false);
+                this.updateGroupState('drums', true);
+            }
+        });
+        
         // Automation controls
         addListener('automationRecord', 'click', () => {
             if (!this.automationRecorder) return;
@@ -786,7 +796,12 @@ export class GenerativeSoundscape {
     initializeGenerators() {
         // Initialize all modular generators with pool manager
         this.generators.drone = new DroneGenerator(this.audioContext, this.poolManager);
-        this.generators.drums = new DrumsGenerator(this.audioContext, this.poolManager);
+        
+        // Use advanced drums if pattern mode is not traditional
+        const useAdvancedDrums = document.getElementById('drumPatternMode')?.value !== 'traditional';
+        this.generators.drums = useAdvancedDrums ? 
+            new AdvancedDrumsGenerator(this.audioContext, this.poolManager) :
+            new DrumsGenerator(this.audioContext, this.poolManager);
         this.generators.glitch = new GlitchGenerator(this.audioContext, this.poolManager);
         this.generators.bleeps = new SineBleepsGenerator(this.audioContext, this.poolManager);
         this.generators.burst = new DataBurstGenerator(this.audioContext, this.poolManager);
@@ -830,7 +845,15 @@ export class GenerativeSoundscape {
                 swing: parseFloat(document.getElementById('drumSwing').value) / 100,
                 snareRush: parseFloat(document.getElementById('snareRush').value) / 100,
                 ghostNotes: parseFloat(document.getElementById('ghostNotes').value) / 100,
-                hihatSpeed: parseInt(document.getElementById('hihatSpeed').value)
+                hihatSpeed: parseInt(document.getElementById('hihatSpeed').value),
+                // Advanced pattern parameters
+                patternMode: document.getElementById('drumPatternMode')?.value || 'traditional',
+                euclideanSteps: parseInt(document.getElementById('euclideanSteps')?.value || 16),
+                kickPulses: parseInt(document.getElementById('kickPulses')?.value || 4),
+                snarePulses: parseInt(document.getElementById('snarePulses')?.value || 2),
+                hihatPulses: parseInt(document.getElementById('hihatPulses')?.value || 8),
+                probability: document.getElementById('drumProbability')?.checked,
+                humanize: parseFloat(document.getElementById('drumHumanize')?.value || 20) / 100
             };
             this.generators.drums.start(drumParams, this.masterBus.getConnectionNodes());
         }
@@ -1060,6 +1083,17 @@ export class GenerativeSoundscape {
                     }
                     break;
                 case 'drums':
+                    // Recreate drums generator if pattern mode changed
+                    const patternMode = document.getElementById('drumPatternMode')?.value || 'traditional';
+                    const needsAdvanced = patternMode !== 'traditional';
+                    const isAdvanced = this.generators.drums instanceof AdvancedDrumsGenerator;
+                    
+                    if (needsAdvanced !== isAdvanced) {
+                        this.generators.drums = needsAdvanced ? 
+                            new AdvancedDrumsGenerator(this.audioContext, this.poolManager) :
+                            new DrumsGenerator(this.audioContext, this.poolManager);
+                    }
+                    
                     const drumParams = {
                         pattern: document.getElementById('drumPattern').value,
                         tempo: parseInt(document.getElementById('drumTempo').value),
@@ -1068,7 +1102,15 @@ export class GenerativeSoundscape {
                         swing: parseFloat(document.getElementById('drumSwing').value) / 100,
                         snareRush: parseFloat(document.getElementById('snareRush').value) / 100,
                         ghostNotes: parseFloat(document.getElementById('ghostNotes').value) / 100,
-                        hihatSpeed: parseInt(document.getElementById('hihatSpeed').value)
+                        hihatSpeed: parseInt(document.getElementById('hihatSpeed').value),
+                        // Advanced pattern parameters
+                        patternMode: patternMode,
+                        euclideanSteps: parseInt(document.getElementById('euclideanSteps')?.value || 16),
+                        kickPulses: parseInt(document.getElementById('kickPulses')?.value || 4),
+                        snarePulses: parseInt(document.getElementById('snarePulses')?.value || 2),
+                        hihatPulses: parseInt(document.getElementById('hihatPulses')?.value || 8),
+                        probability: document.getElementById('drumProbability')?.checked,
+                        humanize: parseFloat(document.getElementById('drumHumanize')?.value || 20) / 100
                     };
                     this.generators.drums.start(drumParams, this.masterBus.getConnectionNodes());
                     break;
@@ -1441,6 +1483,12 @@ export class GenerativeSoundscape {
             { id: 'karplusDamping', min: 0.9, max: 0.99 },
             { id: 'karplusBrightness', min: 2000, max: 8000 },
             { id: 'karplusPluck', min: 20, max: 80 },
+            // Advanced drum parameters
+            { id: 'euclideanSteps', min: 8, max: 32 },
+            { id: 'kickPulses', min: 1, max: 12 },
+            { id: 'snarePulses', min: 1, max: 8 },
+            { id: 'hihatPulses', min: 1, max: 16 },
+            { id: 'drumHumanize', min: 0, max: 50 },
             // Additive Synthesis
             { id: 'additiveDensity', min: 0, max: 25 },
             { id: 'additiveFundamental', min: 100, max: 400 },
@@ -1515,6 +1563,21 @@ export class GenerativeSoundscape {
             drumPattern.dispatchEvent(new Event('change'));
         }
         
+        // Randomly select drum pattern mode
+        const drumPatternModes = ['traditional', 'euclidean', 'markov', 'polyrhythm'];
+        const drumPatternMode = document.getElementById('drumPatternMode');
+        if (drumPatternMode) {
+            drumPatternMode.value = drumPatternModes[Math.floor(Math.random() * drumPatternModes.length)];
+            drumPatternMode.dispatchEvent(new Event('change'));
+        }
+        
+        // Randomly set drum probability mode
+        const drumProbability = document.getElementById('drumProbability');
+        if (drumProbability) {
+            drumProbability.checked = Math.random() > 0.3; // 70% chance of being on
+            drumProbability.dispatchEvent(new Event('change'));
+        }
+        
         // Randomly select noise type
         const noiseTypes = ['white', 'pink', 'brown', 'crackle'];
         const noiseSelect = document.getElementById('noiseType');
@@ -1553,6 +1616,14 @@ export class GenerativeSoundscape {
         if (vowelSelect) {
             vowelSelect.value = vowels[Math.floor(Math.random() * vowels.length)];
             vowelSelect.dispatchEvent(new Event('change'));
+        }
+        
+        // Randomly select sample (get available samples from select options)
+        const sampleSelect = document.getElementById('sampleSelect');
+        if (sampleSelect && sampleSelect.options.length > 0) {
+            const randomIndex = Math.floor(Math.random() * sampleSelect.options.length);
+            sampleSelect.selectedIndex = randomIndex;
+            sampleSelect.dispatchEvent(new Event('change'));
         }
         
         // Randomly activate some LFOs (20% chance for each to reduce CPU load)
@@ -1774,6 +1845,25 @@ export class GenerativeSoundscape {
             this.morphTargets.set('vocalVowel', vowels[Math.floor(Math.random() * vowels.length)]);
         }
         
+        // Random sample selection (only if sample player enabled)
+        if (this.groupEnabled.sample) {
+            const sampleSelect = document.getElementById('sampleSelect');
+            if (sampleSelect && sampleSelect.options.length > 0) {
+                const randomIndex = Math.floor(Math.random() * sampleSelect.options.length);
+                this.morphTargets.set('sampleSelect', sampleSelect.options[randomIndex].value);
+            }
+        }
+        
+        // Random advanced drum settings (only if drums enabled)
+        if (this.groupEnabled.drums) {
+            // Pattern mode
+            const drumPatternModes = ['traditional', 'euclidean', 'markov', 'polyrhythm'];
+            this.morphTargets.set('drumPatternMode', drumPatternModes[Math.floor(Math.random() * drumPatternModes.length)]);
+            
+            // Probability mode
+            this.morphTargets.set('drumProbability', Math.random() > 0.3);
+        }
+        
         // Randomly enable/disable groups respecting min/max limits
         const minGroups = parseInt(document.getElementById('minGroups')?.value || 3);
         const maxGroups = parseInt(document.getElementById('maxGroups')?.value || 8);
@@ -1887,6 +1977,27 @@ export class GenerativeSoundscape {
             if (vocalVowel && this.morphTargets.has('vocalVowel')) {
                 vocalVowel.value = this.morphTargets.get('vocalVowel');
                 vocalVowel.dispatchEvent(new Event('change'));
+            }
+            
+            // Change sample selection
+            const sampleSelect = document.getElementById('sampleSelect');
+            if (sampleSelect && this.morphTargets.has('sampleSelect')) {
+                sampleSelect.value = this.morphTargets.get('sampleSelect');
+                sampleSelect.dispatchEvent(new Event('change'));
+            }
+            
+            // Change drum pattern mode
+            const drumPatternMode = document.getElementById('drumPatternMode');
+            if (drumPatternMode && this.morphTargets.has('drumPatternMode')) {
+                drumPatternMode.value = this.morphTargets.get('drumPatternMode');
+                drumPatternMode.dispatchEvent(new Event('change'));
+            }
+            
+            // Change drum probability mode
+            const drumProbability = document.getElementById('drumProbability');
+            if (drumProbability && this.morphTargets.has('drumProbability')) {
+                drumProbability.checked = this.morphTargets.get('drumProbability');
+                drumProbability.dispatchEvent(new Event('change'));
             }
             
             // Apply group enable/disable states

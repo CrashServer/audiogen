@@ -517,3 +517,28 @@ h2 {
     flex: 1;
     min-width: 60px;
 }
+
+/* Advanced pattern mode styles */
+#drumPatternMode {
+    background: #222;
+    color: #fff;
+    transition: background 0.3s;
+}
+
+#drumPatternMode option[value="euclidean"] {
+    background: #2a4a2a;
+}
+
+#drumPatternMode option[value="markov"] {
+    background: #4a2a2a;
+}
+
+#drumPatternMode option[value="polyrhythm"] {
+    background: #2a2a4a;
+}
+
+/* Hide/show pattern-specific controls */
+.euclidean-controls,
+.polyrhythm-controls {
+    transition: opacity 0.3s;
+}

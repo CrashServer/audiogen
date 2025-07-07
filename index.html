@@ -324,6 +324,44 @@
                 <input type="range" id="hihatSpeed" min="1" max="8" value="1">
                 <span class="value">1</span>
             </div>
+            <div class="control-group">
+                <label>Pattern Mode</label>
+                <select id="drumPatternMode">
+                    <option value="traditional">Traditional</option>
+                    <option value="euclidean">Euclidean</option>
+                    <option value="markov">Markov Chain</option>
+                    <option value="polyrhythm">Polyrhythm</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Euclidean Steps</label>
+                <input type="range" id="euclideanSteps" min="4" max="32" value="16">
+                <span class="value">16</span>
+            </div>
+            <div class="control-group">
+                <label>Kick Pulses</label>
+                <input type="range" id="kickPulses" min="1" max="16" value="4">
+                <span class="value">4</span>
+            </div>
+            <div class="control-group">
+                <label>Snare Pulses</label>
+                <input type="range" id="snarePulses" min="1" max="16" value="2">
+                <span class="value">2</span>
+            </div>
+            <div class="control-group">
+                <label>HiHat Pulses</label>
+                <input type="range" id="hihatPulses" min="1" max="16" value="8">
+                <span class="value">8</span>
+            </div>
+            <div class="control-group">
+                <label>Probability Mode</label>
+                <input type="checkbox" id="drumProbability" checked>
+            </div>
+            <div class="control-group">
+                <label>Humanize</label>
+                <input type="range" id="drumHumanize" min="0" max="100" value="20">
+                <span class="value">20</span>
+            </div>
         </div>
 
         <div class="section">
