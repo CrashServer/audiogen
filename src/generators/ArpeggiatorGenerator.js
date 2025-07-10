@@ -13,6 +13,7 @@ export class ArpeggiatorGenerator {
         
         const { enable, pattern, speed, octaves, gate, tempo } = params;
         this.masterNodes = masterNodes;
+        this.currentParams = params; // Store for tempo updates
         
         if (enable === 0) return;
         
@@ -107,5 +108,21 @@ export class ArpeggiatorGenerator {
     updateParameter(param, value) {
         // Parameters are handled in the start method
         // Could implement dynamic updates here if needed
+    }
+    
+    updateTempo(masterTempo) {
+        // Store the master tempo for use in restart
+        this.masterTempo = masterTempo;
+        
+        // If currently playing, restart with new tempo
+        if (this.isPlaying && this.scheduler) {
+            const currentParams = this.currentParams;
+            if (currentParams) {
+                // Update the tempo in current params
+                currentParams.tempo = masterTempo.bpm;
+                this.stop();
+                this.start(currentParams, this.masterNodes);
+            }
+        }
     }
 }

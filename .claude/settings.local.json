@@ -14,7 +14,14 @@
       "Bash(npm run build:*)",
       "Bash(node:*)",
       "Bash(rg:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(python3:*)",
+      "Bash(./build.js)",
+      "Bash(pkill:*)",
+      "Bash(kill:*)",
+      "Bash(curl:*)",
+      "Bash(awk:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": []
   }

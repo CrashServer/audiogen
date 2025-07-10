@@ -16,10 +16,12 @@
             <button id="randomizeButton" class="control-button secondary">RANDOMIZE</button>
             <button id="morphButton" class="control-button secondary">MORPH</button>
             <button id="autoButton" class="control-button secondary">AUTO</button>
+            <button id="clearButton" class="control-button secondary">CLEAR</button>
             <button id="recordButton" class="control-button record">RECORD</button>
         </div>
         
         <div class="secondary-controls">
+            <button id="visualButton" class="control-button secondary small">VISUAL</button>
             <button id="liteButton" class="control-button secondary small">LITE MODE</button>
             <button id="shareButton" class="control-button secondary small">SHARE</button>
             <button id="helpButton" class="control-button secondary small">HELP</button>
@@ -33,6 +35,12 @@
                 <label>Volume</label>
                 <input type="range" id="masterVolume" min="0" max="100" value="50">
                 <span class="value">50</span>
+            </div>
+            <div class="control-group">
+                <label>Master BPM</label>
+                <input type="range" id="masterBPM" min="60" max="180" value="120">
+                <span class="value">120</span>
+                <button class="lfo-button" data-param="masterBPM">MOD</button>
             </div>
             <div class="control-group">
                 <label>Reverb</label>
@@ -68,8 +76,31 @@
             </div>
             <div class="control-group">
                 <label>Max Groups</label>
-                <input type="range" id="maxGroups" min="1" max="17" value="8">
-                <span class="value">8</span>
+                <input type="range" id="maxGroups" min="1" max="19" value="12">
+                <span class="value">12</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Presets</h2>
+            <div class="control-group">
+                <label>Preset Name</label>
+                <input type="text" id="presetName" placeholder="Enter preset name..." style="width: 160px; padding: 4px; background: #111; border: 1px solid #333; color: #fff;">
+                <button id="savePreset" class="control-button secondary small">SAVE</button>
+            </div>
+            <div class="control-group">
+                <label>Load Preset</label>
+                <select id="presetSelect" style="width: 160px; padding: 4px; background: #111; border: 1px solid #333; color: #fff;">
+                    <option value="">Select preset...</option>
+                </select>
+                <button id="loadPreset" class="control-button secondary small">LOAD</button>
+                <button id="deletePreset" class="control-button secondary small">DELETE</button>
+            </div>
+            <div class="control-group">
+                <label>Quick Actions</label>
+                <button id="exportPresets" class="control-button secondary small">EXPORT</button>
+                <button id="importPresets" class="control-button secondary small">IMPORT</button>
+                <button id="resetPresets" class="control-button secondary small">RESET</button>
             </div>
         </div>
         
@@ -811,6 +842,169 @@
                 <button class="lfo-button" data-param="additiveBrightness">MOD</button>
             </div>
         </div>
+        
+        <div class="section">
+            <h2><input type="checkbox" id="chaosEnable" class="group-enable" checked> Chaos Theory <span class="activity-indicator" id="chaosActivity"></span></h2>
+            <div class="control-group">
+                <label>Density</label>
+                <input type="range" id="chaosDensity" min="0" max="100" value="70">
+                <span class="value">70</span>
+                <button class="lfo-button" data-param="chaosDensity">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Chaos Type</label>
+                <select id="chaosType">
+                    <option value="lorenz">Lorenz Attractor</option>
+                    <option value="rossler">Rössler Attractor</option>
+                    <option value="chua">Chua's Circuit</option>
+                    <option value="henon">Hénon Map</option>
+                    <option value="logistic">Logistic Map</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Chaos Intensity</label>
+                <input type="range" id="chaosIntensity" min="0" max="100" value="50">
+                <span class="value">50</span>
+                <button class="lfo-button" data-param="chaosIntensity">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Musical Scale</label>
+                <select id="chaosScale">
+                    <option value="pentatonic">Pentatonic</option>
+                    <option value="major">Major</option>
+                    <option value="minor">Minor</option>
+                    <option value="dorian">Dorian</option>
+                    <option value="chromatic">Chromatic</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Resonance</label>
+                <input type="range" id="chaosResonance" min="0" max="100" value="60">
+                <span class="value">60</span>
+                <button class="lfo-button" data-param="chaosResonance">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Evolution Speed</label>
+                <input type="range" id="chaosSpeed" min="10" max="200" value="100">
+                <span class="value">100</span>
+                <button class="lfo-button" data-param="chaosSpeed">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Musical Filter</label>
+                <input type="checkbox" id="chaosFilter" checked>
+                <span class="info-text">Quantize to musical scales</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2><input type="checkbox" id="biologicalEnable" class="group-enable" checked> Biological Patterns <span class="activity-indicator" id="biologicalActivity"></span></h2>
+            <div class="control-group">
+                <label>Density</label>
+                <input type="range" id="bioDensity" min="0" max="100" value="80">
+                <span class="value">80</span>
+                <button class="lfo-button" data-param="bioDensity">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Pattern Type</label>
+                <select id="bioType">
+                    <option value="dna">DNA Sequences</option>
+                    <option value="heartbeat">Heartbeat Variability</option>
+                    <option value="brainwave">Brainwave Entrainment</option>
+                    <option value="fibonacci">Fibonacci Growth</option>
+                    <option value="cellular">Cellular Automata</option>
+                    <option value="ecosystem">Ecosystem Dynamics</option>
+                    <option value="genetic">Genetic Evolution</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Evolution Speed</label>
+                <input type="range" id="bioEvolution" min="10" max="200" value="100">
+                <span class="value">100</span>
+                <button class="lfo-button" data-param="bioEvolution">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Natural Harmony</label>
+                <input type="range" id="bioHarmony" min="0" max="100" value="70">
+                <span class="value">70</span>
+                <button class="lfo-button" data-param="bioHarmony">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Organic Variation</label>
+                <input type="range" id="bioVariation" min="0" max="100" value="50">
+                <span class="value">50</span>
+                <button class="lfo-button" data-param="bioVariation">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Life Complexity</label>
+                <input type="range" id="bioComplexity" min="0" max="100" value="60">
+                <span class="value">60</span>
+                <button class="lfo-button" data-param="bioComplexity">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Adaptive Growth</label>
+                <input type="checkbox" id="bioAdaptive" checked>
+                <span class="info-text">Allow system to adapt and evolve</span>
+            </div>
+        </div>
+        
+        <div class="section" id="sampleSection">
+            <h2><input type="checkbox" id="sampleEnable" class="group-enable" checked> Sample Player <span class="activity-indicator" id="sampleActivity"></span></h2>
+            <div class="control-group">
+                <label>Density</label>
+                <input type="range" id="sampleDensity" min="0" max="100" value="30">
+                <span class="value">30</span>
+                <button class="lfo-button" data-param="sampleDensity">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Pitch</label>
+                <input type="range" id="samplePitch" min="0.25" max="4" value="1" step="0.01">
+                <span class="value">1</span>
+                <button class="lfo-button" data-param="samplePitch">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Reverse</label>
+                <input type="range" id="sampleReverse" min="0" max="100" value="0">
+                <span class="value">0</span>
+                <button class="lfo-button" data-param="sampleReverse">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Chop</label>
+                <input type="range" id="sampleChop" min="0" max="100" value="0">
+                <span class="value">0</span>
+                <button class="lfo-button" data-param="sampleChop">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Scatter</label>
+                <input type="range" id="sampleScatter" min="0" max="100" value="20">
+                <span class="value">20</span>
+                <button class="lfo-button" data-param="sampleScatter">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Granular</label>
+                <input type="range" id="sampleGranular" min="0" max="100" value="0">
+                <span class="value">0</span>
+                <button class="lfo-button" data-param="sampleGranular">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Filter Freq</label>
+                <input type="range" id="sampleFilterFreq" min="100" max="10000" value="5000">
+                <span class="value">5000</span>
+                <button class="lfo-button" data-param="sampleFilterFreq">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Filter Res</label>
+                <input type="range" id="sampleFilterRes" min="0.1" max="10" value="1" step="0.1">
+                <span class="value">1</span>
+                <button class="lfo-button" data-param="sampleFilterRes">MOD</button>
+            </div>
+            <div class="control-group">
+                <label>Load Samples</label>
+                <button id="loadSampleFiles" class="control-button secondary small">BROWSE</button>
+                <button id="clearSamples" class="control-button secondary small">CLEAR</button>
+                <span class="info-text">Drag & drop audio files here</span>
+            </div>
+            <div id="sampleMappingDisplay" class="sample-mapping" style="display: none;"></div>
+        </div>
             </div>
         </div>
     </div>
@@ -843,6 +1037,2379 @@
         </div>
     </div>
 
-    <script src="app.bundle.js"></script>
+    <script>
+        // Simple inline test to see if JavaScript works at all
+        console.log('Inline JavaScript is working');
+        window.simpleTest = function() {
+            alert('Simple test button works!');
+            console.log('Simple test function called');
+        };
+        
+        // Check if app bundle loaded and ADD the method manually
+        setTimeout(() => {
+            console.log('Checking soundscape availability...');
+            console.log('window.soundscape:', window.soundscape);
+            console.log('typeof window.soundscape:', typeof window.soundscape);
+            
+            if (window.soundscape) {
+                console.log('App bundle loaded successfully, soundscape exists');
+                
+                // DIRECTLY ADD the toggleVisualization method to the existing object
+                window.soundscape.toggleVisualization = function() {
+                    console.log('toggleVisualization called via direct assignment');
+                    
+                    // Simple visual without complex imports
+                    try {
+                        // Create visualization canvas
+                        if (!this.visualCanvas) {
+                            this.visualCanvas = document.createElement('canvas');
+                            this.visualCanvas.style.position = 'fixed';
+                            this.visualCanvas.style.top = '0';
+                            this.visualCanvas.style.left = '0'; 
+                            this.visualCanvas.style.width = '100vw';
+                            this.visualCanvas.style.height = '100vh';
+                            this.visualCanvas.style.backgroundColor = '#000';
+                            this.visualCanvas.style.zIndex = '9999';
+                            this.visualCanvas.style.display = 'none';
+                            this.visualCanvas.width = window.innerWidth;
+                            this.visualCanvas.height = window.innerHeight;
+                            document.body.appendChild(this.visualCanvas);
+                            
+                            this.ctx = this.visualCanvas.getContext('2d');
+                            this.animationTime = 0;
+                            
+                            this.visualCanvas.addEventListener('click', () => {
+                                this.visualCanvas.style.display = 'none';
+                                this.visualActive = false;
+                                if (this.animationFrame) {
+                                    cancelAnimationFrame(this.animationFrame);
+                                }
+                            });
+                            
+                            // Add keyboard controls for grid and colors
+                            document.addEventListener('keydown', (e) => {
+                                if (!this.visualActive) return;
+                                
+                                switch(e.key) {
+                                    case '1': this.changeGridConfig('small'); break;
+                                    case '2': this.changeGridConfig('medium'); break;
+                                    case '3': this.changeGridConfig('large'); break;
+                                    case '4': this.changeGridConfig('fullscreen'); break;
+                                    case '5': this.changeGridConfig('ultrawide'); break;
+                                    case '6': this.changeGridConfig('hexagon'); break;
+                                    case '7': this.changeGridConfig('circle'); break;
+                                    case 'c': this.cyclePalette(); break;
+                                    case 'r': this.randomizePalette(); break;
+                                    case 'a': this.gridAutoResize = !this.gridAutoResize; break;
+                                    case 'ArrowUp': this.adjustGridSize(1.1); break;
+                                    case 'ArrowDown': this.adjustGridSize(0.9); break;
+                                    case 'q': this.changeVisualMode('matrix'); break;
+                                    case 'w': this.changeVisualMode('organic'); break;
+                                    case 'e': this.changeVisualMode('glitch'); break;
+                                    case 'r': this.changeVisualMode('organic'); break;
+                                    case 't': this.changeVisualMode('wave'); break;
+                                    case 'y': this.changeVisualMode('neural'); break;
+                                    case 'u': this.changeVisualMode('particle'); break;
+                                    case 'i': this.changeVisualMode('hybrid'); break;
+                                    case 'v': this.cycleVisualMode(); break;
+                                    case 'g': this.triggerGlitchEffect(); break;
+                                    case 'f': this.triggerOrganicBurst(); break;
+                                    case 'x': this.explodeParticles(); break;
+                                    case 'z': this.autoModeChange = !this.autoModeChange; console.log(`Auto mode change: ${this.autoModeChange ? 'ON' : 'OFF'}`); break;
+                                    case 'o': 
+                                        // Toggle main app auto mode from visual mode
+                                        if (window.soundscape && window.soundscape.app && window.soundscape.app.toggleAutoMode) {
+                                            window.soundscape.app.toggleAutoMode();
+                                        }
+                                        break;
+                                }
+                                e.preventDefault();
+                            });
+                        }
+                        
+                        // Toggle visibility and start animation
+                        if (this.visualActive) {
+                            this.visualCanvas.style.display = 'none';
+                            this.visualActive = false;
+                            if (this.animationFrame) {
+                                cancelAnimationFrame(this.animationFrame);
+                            }
+                        } else {
+                            this.visualCanvas.style.display = 'block';
+                            this.visualActive = true;
+                            this.startVisualization();
+                        }
+                    } catch (error) {
+                        console.error('Visualization error:', error);
+                    }
+                };
+                
+                // Add visualization animation method - Unified Data Matrix with Organic Elements
+                window.soundscape.startVisualization = function() {
+                    // Initialize unified visualization state
+                    this.particles = [];
+                    this.emitters = [];
+                    this.tentacles = [];
+                    this.parameterStates = new Map();
+                    this.globalEnergy = 0;
+                    this.matrixTime = 0;
+                    this.frameCounter = 0; // For performance optimization
+                    
+                    // Initialize visualization modes
+                    this.initVisualizationModes();
+                    
+                    // Dynamic grid configuration system that fills window
+                    this.calculateGridConfigs = function() {
+                        const w = this.visualCanvas.width;
+                        const h = this.visualCanvas.height;
+                        const minDim = Math.min(w, h);
+                        const maxDim = Math.max(w, h);
+                        
+                        return {
+                            small: { 
+                                size: Math.floor(minDim / 50), // Reduced from /25 to /50 for performance
+                                cellSize: Math.floor(minDim / (minDim / 50) * 0.8), 
+                                spacing: 2, // Increased spacing for cleaner look
+                                name: 'Small Grid' 
+                            },
+                            medium: { 
+                                size: Math.floor(minDim / 35), // Reduced from /18 to /35 
+                                cellSize: Math.floor(minDim / (minDim / 35) * 0.8), 
+                                spacing: 2, 
+                                name: 'Medium Grid' 
+                            },
+                            large: { 
+                                size: Math.floor(minDim / 25), // Reduced from /12 to /25
+                                cellSize: Math.floor(minDim / (minDim / 25) * 0.8), 
+                                spacing: 2, 
+                                name: 'Large Grid' 
+                            },
+                            fullscreen: { 
+                                size: Math.floor(minDim / 20), // Reduced from /10 to /20
+                                cellSize: Math.floor(minDim / (minDim / 20) * 0.9), 
+                                spacing: 1, // Added spacing
+                                name: 'Fullscreen Grid' 
+                            },
+                            ultrawide: { 
+                                size: Math.floor(maxDim / 30), // Reduced from /12 to /30
+                                cellSize: Math.floor(minDim / (maxDim / 30) * 0.7), 
+                                spacing: 1, // Added spacing
+                                name: 'Ultra Wide Grid' 
+                            },
+                            hexagon: { 
+                                size: Math.floor(minDim / 30), // Reduced from /15 to /30
+                                cellSize: Math.floor(minDim / (minDim / 30) * 0.8), 
+                                spacing: 1, 
+                                name: 'Hexagon Layout', 
+                                shape: 'hex' 
+                            },
+                            circle: { 
+                                size: Math.floor(minDim / 15), 
+                                cellSize: Math.floor(minDim / (minDim / 15) * 0.8), 
+                                spacing: 1, 
+                                name: 'Circle Layout', 
+                                shape: 'circle' 
+                            }
+                        };
+                    };
+                    
+                    this.gridConfigs = this.calculateGridConfigs();
+                    
+                    this.currentGridConfig = 'medium';
+                    this.gridTransitionProgress = 0;
+                    this.gridAutoResize = true;
+                    
+                    // Initialize matrix with current config
+                    this.matrix = {
+                        ...this.gridConfigs[this.currentGridConfig],
+                        centerX: this.visualCanvas.width / 2,
+                        centerY: this.visualCanvas.height / 2,
+                        cells: new Map(),
+                        evolution: 0,
+                        autoResizeTimer: 0
+                    };
+                    
+                    // LED blink states and enhanced color system
+                    this.ledBlinkStates = new Map();
+                    this.colorPalettes = {
+                        matrix: ['#00ff00', '#44ff44', '#88ff88', '#ccffcc', '#00cc00'],
+                        cyber: ['#00ffff', '#0099ff', '#0066ff', '#ff00ff', '#cc00cc'],
+                        fire: ['#ff0000', '#ff3300', '#ff6600', '#ff9900', '#ffcc00'],
+                        ocean: ['#0066ff', '#0099cc', '#00ccff', '#66ccff', '#99ddff'],
+                        plasma: ['#ff00ff', '#ff3366', '#ff6600', '#ffff00', '#66ff66'],
+                        neon: ['#ff0099', '#00ff99', '#9900ff', '#99ff00', '#ff9900'],
+                        synthwave: ['#ff0066', '#6600ff', '#00ffcc', '#ffcc00', '#ff6699'],
+                        rainbow: ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'],
+                        ice: ['#00ffff', '#ccffff', '#ffffff', '#99ccff', '#6699ff'],
+                        toxic: ['#ccff00', '#99ff33', '#66ff66', '#33ff99', '#00ffcc']
+                    };
+                    this.currentPalette = 'matrix';
+                    this.paletteTransition = 0;
+                    this.colorEvolution = 0;
+                    this.colorCycleSpeed = 0.02;
+                    
+                    // Connection system for parameter relationships
+                    this.parameterConnections = new Map();
+                    this.connectionLines = [];
+                    this.connectionPulses = [];
+                    
+                    // DRAMATIC VISUALIZATION MODES
+                    this.visualModes = {
+                        matrix: { name: 'Data Matrix', weight: 1.0 },
+                        organic: { name: 'Organic Flow', weight: 0.8 },
+                        glitch: { name: 'Glitch Storm', weight: 0.6 },
+                        wave: { name: 'Wave Distortion', weight: 0.5 },
+                        neural: { name: 'Neural Network', weight: 0.9 },
+                        particle: { name: 'Particle Field', weight: 0.8 },
+                        hybrid: { name: 'Hybrid Chaos', weight: 0.4 }
+                    };
+                    this.currentVisualMode = 'matrix';
+                    this.modeTransition = 0;
+                    this.modeChangeTimer = 0;
+                    this.visualIntensity = 0.5;
+                    
+                    // Advanced particle systems
+                    this.particleSystems = {
+                        sparks: [],
+                        flows: [],
+                        clouds: [],
+                        swarms: [],
+                        explosions: []
+                    };
+                    
+                    // Glitch system
+                    this.glitchEffects = {
+                        active: false,
+                        intensity: 0,
+                        scanlines: [],
+                        corruption: [],
+                        noise: [],
+                        displacement: { x: 0, y: 0 }
+                    };
+                    
+                    // Wave distortion system
+                    this.waveSystem = {
+                        waves: [],
+                        amplitude: 0,
+                        frequency: 0,
+                        phase: 0,
+                        distortion: 0
+                    };
+                    
+                    // Fractal system
+                    this.flowSystem = {
+                        flows: [],
+                        emitterNodes: [],
+                        connections: [],
+                        evolution: 0,
+                        intensity: 0.5
+                    };
+                    
+                    // Neural network visualization
+                    this.neuralSystem = {
+                        neurons: [],
+                        connections: [],
+                        activity: new Map(),
+                        learning: false
+                    };
+                    
+                    // Wave system
+                    this.waveSystem = {
+                        phase: 0,
+                        amplitude: 30,
+                        frequency: 0.1,
+                        layers: 8
+                    };
+                    
+                    // Initialize data matrix cells
+                    for (let x = 0; x < this.matrix.size; x++) {
+                        for (let y = 0; y < this.matrix.size; y++) {
+                            this.matrix.cells.set(`${x},${y}`, {
+                                x: x,
+                                y: y,
+                                activity: 0,
+                                lastActivity: 0,
+                                color: [50, 50, 50],
+                                type: 'data',
+                                connections: [],
+                                pulse: Math.random() * Math.PI * 2
+                            });
+                        }
+                    }
+                    
+                    // Map parameters to matrix positions with unique colors - DYNAMIC POSITIONING
+                    const parameterMappings = [
+                        { name: 'masterVolume', mx: Math.floor(this.matrix.size * 0.5), my: Math.floor(this.matrix.size * 0.5), color: [255, 255, 255], type: 'central' },
+                        { name: 'reverb', mx: Math.floor(this.matrix.size * 0.2), my: Math.floor(this.matrix.size * 0.2), color: [100, 255, 150], type: 'ambient' },
+                        { name: 'delay', mx: Math.floor(this.matrix.size * 0.8), my: Math.floor(this.matrix.size * 0.8), color: [255, 200, 100], type: 'echo' },
+                        { name: 'droneFreq', mx: Math.floor(this.matrix.size * 0.1), my: Math.floor(this.matrix.size * 0.7), color: [255, 100, 100], type: 'drone' },
+                        { name: 'glitchIntensity', mx: Math.floor(this.matrix.size * 0.9), my: Math.floor(this.matrix.size * 0.3), color: [255, 50, 255], type: 'chaos' },
+                        { name: 'drumTempo', mx: Math.floor(this.matrix.size * 0.3), my: Math.floor(this.matrix.size * 0.1), color: [100, 150, 255], type: 'rhythm' },
+                        { name: 'bleepDensity', mx: Math.floor(this.matrix.size * 0.7), my: Math.floor(this.matrix.size * 0.1), color: [100, 255, 255], type: 'burst' },
+                        { name: 'burstActivity', mx: Math.floor(this.matrix.size * 0.1), my: Math.floor(this.matrix.size * 0.9), color: [255, 255, 100], type: 'spark' },
+                        { name: 'fmCarrier', mx: Math.floor(this.matrix.size * 0.6), my: Math.floor(this.matrix.size * 0.4), color: [200, 100, 255], type: 'wave' },
+                        { name: 'noiseLevel', mx: Math.floor(this.matrix.size * 0.4), my: Math.floor(this.matrix.size * 0.9), color: [150, 255, 150], type: 'texture' },
+                        { name: 'acidLevel', mx: Math.floor(this.matrix.size * 0.8), my: Math.floor(this.matrix.size * 0.6), color: [255, 255, 0], type: 'acid' },
+                        { name: 'grainDensity', mx: Math.floor(this.matrix.size * 0.2), my: Math.floor(this.matrix.size * 0.6), color: [255, 150, 50], type: 'granular' },
+                        { name: 'padDensity', mx: Math.floor(this.matrix.size * 0.6), my: Math.floor(this.matrix.size * 0.8), color: [150, 200, 255], type: 'pad' },
+                        { name: 'chordDensity', mx: Math.floor(this.matrix.size * 0.9), my: Math.floor(this.matrix.size * 0.5), color: [255, 200, 200], type: 'chord' },
+                        { name: 'vocalDensity', mx: Math.floor(this.matrix.size * 0.3), my: Math.floor(this.matrix.size * 0.3), color: [200, 255, 200], type: 'vocal' }
+                    ];
+                    
+                    parameterMappings.forEach(config => {
+                        // Create emitter
+                        const worldX = this.matrix.centerX + (config.mx - this.matrix.size/2) * (this.matrix.cellSize + this.matrix.spacing);
+                        const worldY = this.matrix.centerY + (config.my - this.matrix.size/2) * (this.matrix.cellSize + this.matrix.spacing);
+                        
+                        this.emitters.push({
+                            name: config.name,
+                            matrixX: config.mx,
+                            matrixY: config.my,
+                            worldX: worldX,
+                            worldY: worldY,
+                            type: config.type,
+                            color: config.color,
+                            energy: 0,
+                            radius: 8,
+                            phase: Math.random() * Math.PI * 2,
+                            lastBurst: 0
+                        });
+                        
+                        // Set parameter state
+                        this.parameterStates.set(config.name, {
+                            value: 0,
+                            velocity: 0,
+                            activity: 0,
+                            lastChange: 0
+                        });
+                        
+                        // Mark matrix cell as emitter
+                        if (this.matrix.cells.has(`${config.mx},${config.my}`)) {
+                            const cell = this.matrix.cells.get(`${config.mx},${config.my}`);
+                            cell.type = 'emitter';
+                            cell.color = config.color;
+                            cell.paramName = config.name;
+                        }
+                    });
+                    
+                    // Monitor parameter changes with immediate matrix updates
+                    this.parameterInputs = document.querySelectorAll('input[type="range"]');
+                    this.parameterInputs.forEach(input => {
+                        if (this.parameterStates.has(input.id)) {
+                            const state = this.parameterStates.get(input.id);
+                            state.value = parseFloat(input.value) / 100;
+                            
+                            input.addEventListener('input', (e) => {
+                                const newValue = parseFloat(e.target.value) / 100;
+                                const change = Math.abs(newValue - state.value);
+                                
+                                state.value = newValue;
+                                state.velocity = change * 30;
+                                state.activity = Math.min(2, state.activity + change * 15);
+                                state.lastChange = this.matrixTime;
+                                
+                                // Update global energy
+                                this.globalEnergy = Math.min(2, this.globalEnergy + change * 8);
+                                
+                                // Trigger immediate responses
+                                if (change > 0.01) {
+                                    this.triggerParameterBurst(input.id, change);
+                                    this.updateMatrixActivity(input.id, change);
+                                    this.createTentacleConnection(input.id);
+                                }
+                            });
+                        }
+                    });
+                    
+                    // Main animation loop - Unified Data Matrix System
+                    const animate = () => {
+                        if (!this.visualActive) return;
+                        
+                        this.frameCounter++;
+                        this.matrixTime += 0.016;
+                        this.matrix.evolution += 0.002;
+                        
+                        // LED persistence effect
+                        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+                        this.ctx.fillRect(0, 0, this.visualCanvas.width, this.visualCanvas.height);
+                        
+                        // Occasional Ikeda-style erasures
+                        if (Math.random() < 0.008) {
+                            this.ctx.fillStyle = '#000000';
+                            const eraseType = Math.floor(Math.random() * 4);
+                            switch(eraseType) {
+                                case 0: // Thin line
+                                    this.ctx.fillRect(0, Math.random() * this.visualCanvas.height, this.visualCanvas.width, 2);
+                                    break;
+                                case 1: // Vertical line
+                                    this.ctx.fillRect(Math.random() * this.visualCanvas.width, 0, 2, this.visualCanvas.height);
+                                    break;
+                                case 2: // Small blocks
+                                    for (let i = 0; i < 3; i++) {
+                                        this.ctx.fillRect(Math.random() * this.visualCanvas.width, Math.random() * this.visualCanvas.height, 30, 30);
+                                    }
+                                    break;
+                                case 3: // Diagonal sweep
+                                    this.ctx.save();
+                                    this.ctx.translate(this.visualCanvas.width/2, this.visualCanvas.height/2);
+                                    this.ctx.rotate(Math.random() * Math.PI * 2);
+                                    this.ctx.fillRect(-this.visualCanvas.width, -3, this.visualCanvas.width * 2, 6);
+                                    this.ctx.restore();
+                                    break;
+                            }
+                        }
+                        
+                        // Update all systems
+                        this.updateMatrix();
+                        this.updateEmitters();
+                        this.updateParticles();
+                        this.updateTentacles();
+                        this.updateColorEvolution();
+                        this.updateGridEvolution();
+                        this.updateModeSpecific();
+                        
+                        // Render all systems
+                        this.drawMatrix();
+                        this.drawParameterConnections();
+                        this.drawTentacles();
+                        this.drawEmitters();
+                        this.drawParticles();
+                        
+                        // Render mode effects only every other frame for better performance
+                        if (this.frameCounter % 2 === 0) {
+                            this.renderModeEffects();
+                        }
+                        
+                        // Draw grid info less frequently for cleaner performance
+                        if (this.frameCounter % 4 === 0) {
+                            this.drawGridInfo();
+                        }
+                        
+                        // Decay states
+                        this.globalEnergy *= 0.98;
+                        this.parameterStates.forEach(state => {
+                            state.activity *= 0.97;
+                            state.velocity *= 0.95;
+                        });
+                        
+                        this.animationFrame = requestAnimationFrame(animate);
+                    };
+                    animate();
+                };
+                
+                // UNIFIED DATA MATRIX SYSTEM METHODS
+                
+                // Update the data matrix evolution
+                window.soundscape.updateMatrix = function() {
+                    this.matrix.cells.forEach((cell, key) => {
+                        // Organic pulse evolution
+                        cell.pulse += 0.03 + cell.activity * 0.1;
+                        
+                        // Activity decay with organic patterns
+                        cell.activity *= 0.96;
+                        
+                        // Matrix evolution - cells influence neighbors
+                        if (cell.activity > 0.1 && Math.random() < 0.1) {
+                            const neighbors = this.getNeighbors(cell.x, cell.y);
+                            neighbors.forEach(neighbor => {
+                                if (neighbor && neighbor.activity < cell.activity) {
+                                    neighbor.activity = Math.min(1, neighbor.activity + cell.activity * 0.1);
+                                }
+                            });
+                        }
+                        
+                        // Enhanced color mixing with LFO responsiveness
+                        if (cell.type === 'emitter') {
+                            const state = this.parameterStates.get(cell.paramName);
+                            if (state) {
+                                let intensity = Math.max(0.3, state.activity);
+                                
+                                // Enhanced intensity for LFO-controlled parameters
+                                if (this.lfoControllers && this.lfoControllers.has(cell.paramName)) {
+                                    const lfoController = this.lfoControllers.get(cell.paramName);
+                                    if (lfoController.isActive) {
+                                        // Add pulsing based on LFO phase
+                                        const lfoIntensity = Math.abs(lfoController.currentValue);
+                                        intensity = Math.max(intensity, lfoIntensity * 0.8);
+                                        
+                                        // Add color shifting based on LFO phase
+                                        const phase = lfoController.phase || 0;
+                                        const colorShift = Math.sin(phase) * 0.3;
+                                        
+                                        cell.color = [
+                                            Math.floor(cell.color[0] * intensity * (1 + colorShift)),
+                                            Math.floor(cell.color[1] * intensity),
+                                            Math.floor(cell.color[2] * intensity * (1 - colorShift))
+                                        ];
+                                    } else {
+                                        cell.color = [
+                                            Math.floor(cell.color[0] * intensity),
+                                            Math.floor(cell.color[1] * intensity),
+                                            Math.floor(cell.color[2] * intensity)
+                                        ];
+                                    }
+                                } else {
+                                    cell.color = [
+                                        Math.floor(cell.color[0] * intensity),
+                                        Math.floor(cell.color[1] * intensity),
+                                        Math.floor(cell.color[2] * intensity)
+                                    ];
+                                }
+                                
+                                // Add velocity-based brightness boost
+                                if (state.velocity > 0.5) {
+                                    const boost = Math.min(state.velocity * 0.5, 0.5);
+                                    cell.color = cell.color.map(c => Math.min(255, c + boost * 255));
+                                }
+                            }
+                        } else {
+                            // Data cells gradually shift color based on nearby activity
+                            const baseGlow = 20 + Math.sin(this.matrix.evolution + cell.x * 0.1 + cell.y * 0.1) * 10;
+                            const activityGlow = cell.activity * 100;
+                            const glow = baseGlow + activityGlow;
+                            cell.color = [glow, glow * 0.8, glow * 0.6];
+                        }
+                    });
+                };
+                
+                // Get neighboring cells for matrix evolution
+                window.soundscape.getNeighbors = function(x, y) {
+                    const neighbors = [];
+                    for (let dx = -1; dx <= 1; dx++) {
+                        for (let dy = -1; dy <= 1; dy++) {
+                            if (dx === 0 && dy === 0) continue;
+                            const key = `${x + dx},${y + dy}`;
+                            if (this.matrix.cells.has(key)) {
+                                neighbors.push(this.matrix.cells.get(key));
+                            }
+                        }
+                    }
+                    return neighbors;
+                };
+                
+                // Trigger particle burst from parameter change - PERFORMANCE LIMITED
+                window.soundscape.triggerParameterBurst = function(paramName, intensity) {
+                    const emitter = this.emitters.find(e => e.name === paramName);
+                    if (!emitter) return;
+                    
+                    // Limit total particles for performance
+                    if (this.particles.length > 200) return;
+                    
+                    const particleCount = Math.floor(intensity * 15 + 2); // Reduced from 50+5
+                    for (let i = 0; i < particleCount; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = 2 + Math.random() * 3 + intensity * 3;
+                        const life = 40 + Math.random() * 60 + intensity * 50; // Shorter life
+                        
+                        this.particles.push({
+                            x: emitter.worldX + (Math.random() - 0.5) * 20,
+                            y: emitter.worldY + (Math.random() - 0.5) * 20,
+                            vx: Math.cos(angle) * speed,
+                            vy: Math.sin(angle) * speed,
+                            life: life,
+                            maxLife: life,
+                            size: 1 + Math.random() * 2 + intensity * 2,
+                            color: emitter.color.slice(),
+                            type: emitter.type,
+                            trail: [],
+                            fromMatrix: true
+                        });
+                    }
+                };
+                
+                // Update matrix activity from parameter changes
+                window.soundscape.updateMatrixActivity = function(paramName, intensity) {
+                    const emitter = this.emitters.find(e => e.name === paramName);
+                    if (!emitter) return;
+                    
+                    // Update emitter cell
+                    const cellKey = `${emitter.matrixX},${emitter.matrixY}`;
+                    if (this.matrix.cells.has(cellKey)) {
+                        const cell = this.matrix.cells.get(cellKey);
+                        cell.activity = Math.min(1, cell.activity + intensity * 2);
+                    }
+                    
+                    // Trigger bright LED burst at emitter
+                    if (this.ledBlinkStates.has(cellKey)) {
+                        const led = this.ledBlinkStates.get(cellKey);
+                        led.targetBrightness = 1;
+                        led.isData = false;
+                        led.dataIntensity = 0;
+                    }
+                    
+                    // Create expanding rings of LED activity
+                    const rings = Math.floor(intensity * 10 + 2);
+                    for (let ring = 1; ring <= rings; ring++) {
+                        setTimeout(() => {
+                            // Create a circle of LEDs
+                            const numLeds = ring * 8;
+                            for (let i = 0; i < numLeds; i++) {
+                                const angle = (i / numLeds) * Math.PI * 2;
+                                const x = Math.round(emitter.matrixX + Math.cos(angle) * ring);
+                                const y = Math.round(emitter.matrixY + Math.sin(angle) * ring);
+                                const ledKey = `${x},${y}`;
+                                
+                                if (x >= 0 && x < this.matrix.size && y >= 0 && y < this.matrix.size && this.ledBlinkStates.has(ledKey)) {
+                                    const led = this.ledBlinkStates.get(ledKey);
+                                    led.targetBrightness = Math.max(led.targetBrightness, 0.8 - (ring / rings) * 0.5);
+                                    if (Math.random() < 0.3) {
+                                        led.isData = true;
+                                        led.dataIntensity = 1;
+                                    }
+                                }
+                            }
+                        }, ring * 40);
+                    }
+                    
+                    // Create data flows in random directions
+                    const numFlows = Math.floor(intensity * 5 + 1);
+                    for (let i = 0; i < numFlows; i++) {
+                        this.createDataFlow(emitter.matrixX, emitter.matrixY);
+                    }
+                };
+                
+                // Create organic tentacle connections
+                window.soundscape.createTentacleConnection = function(paramName) {
+                    const sourceEmitter = this.emitters.find(e => e.name === paramName);
+                    if (!sourceEmitter) return;
+                    
+                    // Find other active emitters to connect to
+                    const activeEmitters = this.emitters.filter(e => {
+                        const state = this.parameterStates.get(e.name);
+                        return state && state.activity > 0.2 && e.name !== paramName;
+                    });
+                    
+                    if (activeEmitters.length === 0) return;
+                    
+                    const targetEmitter = activeEmitters[Math.floor(Math.random() * activeEmitters.length)];
+                    const distance = Math.sqrt(
+                        (targetEmitter.worldX - sourceEmitter.worldX)**2 + 
+                        (targetEmitter.worldY - sourceEmitter.worldY)**2
+                    );
+                    
+                    const segments = Math.max(8, Math.floor(distance / 20));
+                    const tentacle = {
+                        source: sourceEmitter,
+                        target: targetEmitter,
+                        segments: [],
+                        life: 1.0,
+                        maxLife: 1.0,
+                        phase: Math.random() * Math.PI * 2,
+                        speed: 0.02 + Math.random() * 0.03,
+                        amplitude: 5 + Math.random() * 15,
+                        thickness: 1 + Math.random() * 3,
+                        color: this.blendColors(sourceEmitter.color, targetEmitter.color)
+                    };
+                    
+                    // Create organic path segments
+                    for (let i = 0; i <= segments; i++) {
+                        const t = i / segments;
+                        const x = sourceEmitter.worldX + (targetEmitter.worldX - sourceEmitter.worldX) * t;
+                        const y = sourceEmitter.worldY + (targetEmitter.worldY - sourceEmitter.worldY) * t;
+                        
+                        tentacle.segments.push({
+                            baseX: x,
+                            baseY: y,
+                            offsetX: 0,
+                            offsetY: 0,
+                            thickness: tentacle.thickness * (1 - Math.abs(t - 0.5) * 0.6)
+                        });
+                    }
+                    
+                    this.tentacles.push(tentacle);
+                    
+                    // Limit tentacles for performance
+                    if (this.tentacles.length > 8) {
+                        this.tentacles.shift();
+                    }
+                };
+                
+                // Blend two colors for tentacles
+                window.soundscape.blendColors = function(color1, color2) {
+                    return [
+                        Math.floor((color1[0] + color2[0]) / 2),
+                        Math.floor((color1[1] + color2[1]) / 2),
+                        Math.floor((color1[2] + color2[2]) / 2)
+                    ];
+                };
+                
+                // Update emitter states
+                window.soundscape.updateEmitters = function() {
+                    this.emitters.forEach(emitter => {
+                        const state = this.parameterStates.get(emitter.name);
+                        if (state) {
+                            emitter.energy = state.activity;
+                            emitter.phase += 0.02 + state.activity * 0.08;
+                            emitter.radius = 6 + Math.sin(emitter.phase) * 4 + state.activity * 8;
+                            
+                            // Reduced continuous particle emission for performance
+                            if (state.activity > 0.6 && this.matrixTime - emitter.lastBurst > 1.0) { // Less frequent
+                                this.triggerParameterBurst(emitter.name, state.activity * 0.2); // Smaller bursts
+                                emitter.lastBurst = this.matrixTime;
+                            }
+                        }
+                    });
+                };
+                
+                // Update particles with organic movement
+                window.soundscape.updateParticles = function() {
+                    for (let i = this.particles.length - 1; i >= 0; i--) {
+                        const p = this.particles[i];
+                        
+                        // Add to trail
+                        p.trail.push({ x: p.x, y: p.y });
+                        if (p.trail.length > 8) p.trail.shift();
+                        
+                        // Organic movement based on emitter type
+                        switch(p.type) {
+                            case 'central':
+                                p.vx += Math.sin(this.matrixTime * 3 + p.x * 0.01) * 0.1;
+                                p.vy += Math.cos(this.matrixTime * 2 + p.y * 0.01) * 0.1;
+                                break;
+                            case 'chaos':
+                                p.vx += (Math.random() - 0.5) * 0.3;
+                                p.vy += (Math.random() - 0.5) * 0.3;
+                                break;
+                            case 'ambient':
+                                p.vx += Math.sin(this.matrixTime + p.x * 0.005) * 0.05;
+                                p.vy += Math.sin(this.matrixTime * 0.8 + p.y * 0.005) * 0.05;
+                                break;
+                            case 'rhythm':
+                                const beat = Math.sin(this.matrixTime * 6);
+                                if (beat > 0.7) {
+                                    p.vx *= 1.1;
+                                    p.vy *= 1.1;
+                                }
+                                break;
+                        }
+                        
+                        // Matrix attraction for particles from matrix
+                        if (p.fromMatrix) {
+                            const matrixCenterX = this.matrix.centerX;
+                            const matrixCenterY = this.matrix.centerY;
+                            const dx = matrixCenterX - p.x;
+                            const dy = matrixCenterY - p.y;
+                            const distance = Math.sqrt(dx*dx + dy*dy);
+                            
+                            if (distance > 200) {
+                                const force = 0.002;
+                                p.vx += (dx / distance) * force;
+                                p.vy += (dy / distance) * force;
+                            }
+                        }
+                        
+                        // Update position
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        
+                        // Apply drag
+                        p.vx *= 0.97;
+                        p.vy *= 0.97;
+                        
+                        // Update life
+                        p.life--;
+                        
+                        // Remove dead particles
+                        if (p.life <= 0 || 
+                            p.x < -100 || p.x > this.visualCanvas.width + 100 || 
+                            p.y < -100 || p.y > this.visualCanvas.height + 100) {
+                            this.particles.splice(i, 1);
+                        }
+                    }
+                };
+                
+                // Update tentacles with organic movement
+                window.soundscape.updateTentacles = function() {
+                    for (let i = this.tentacles.length - 1; i >= 0; i--) {
+                        const tentacle = this.tentacles[i];
+                        
+                        tentacle.life -= 0.006;
+                        tentacle.phase += tentacle.speed;
+                        
+                        // Update segment positions with flowing organic movement
+                        tentacle.segments.forEach((segment, segmentIndex) => {
+                            const t = segmentIndex / tentacle.segments.length;
+                            const wave1 = Math.sin(tentacle.phase + t * Math.PI * 4) * tentacle.amplitude;
+                            const wave2 = Math.cos(tentacle.phase * 1.3 + t * Math.PI * 5) * tentacle.amplitude * 0.7;
+                            
+                            segment.offsetX = wave1 * tentacle.life;
+                            segment.offsetY = wave2 * tentacle.life;
+                        });
+                        
+                        // Remove dead tentacles
+                        if (tentacle.life <= 0) {
+                            this.tentacles.splice(i, 1);
+                        }
+                    }
+                };
+                
+                // Draw the LED data matrix
+                window.soundscape.drawMatrix = function() {
+                    const startX = this.matrix.centerX - (this.matrix.size * (this.matrix.cellSize + this.matrix.spacing)) / 2;
+                    const startY = this.matrix.centerY - (this.matrix.size * (this.matrix.cellSize + this.matrix.spacing)) / 2;
+                    
+                    // Draw all LEDs in the grid
+                    for (let x = 0; x < this.matrix.size; x++) {
+                        for (let y = 0; y < this.matrix.size; y++) {
+                            const worldX = startX + x * (this.matrix.cellSize + this.matrix.spacing);
+                            const worldY = startY + y * (this.matrix.cellSize + this.matrix.spacing);
+                            const key = `${x},${y}`;
+                            
+                            // Get or create LED state
+                            if (!this.ledBlinkStates.has(key)) {
+                                this.ledBlinkStates.set(key, {
+                                    brightness: 0,
+                                    targetBrightness: 0,
+                                    blinkPhase: Math.random() * Math.PI * 2,
+                                    isData: false,
+                                    dataIntensity: 0,
+                                    color: [0, 255, 0]
+                                });
+                            }
+                            
+                            const ledState = this.ledBlinkStates.get(key);
+                            const cell = this.matrix.cells.get(key);
+                            
+                            // Random data bursts with organic patterns
+                            const organicNoise = Math.sin(this.matrixTime * 0.3 + x * 0.1 + y * 0.1) * 0.5 + 0.5;
+                            if (Math.random() < (0.001 + this.globalEnergy * 0.005) * organicNoise) {
+                                ledState.targetBrightness = 0.5 + Math.random() * 0.5;
+                                ledState.isData = true;
+                                ledState.dataIntensity = 1;
+                                this.createDataFlow(x, y);
+                            }
+                            
+                            // Parameter emitter cells are always more active
+                            if (cell && cell.type === 'emitter') {
+                                const state = this.parameterStates.get(cell.paramName);
+                                if (state && state.activity > 0) {
+                                    ledState.targetBrightness = Math.max(ledState.targetBrightness, 0.5 + state.activity * 0.5);
+                                    // Use evolving palette colors for emitters
+                                    const paletteColors = this.colorPalettes[this.currentPalette];
+                                    const colorIndex = Math.floor(this.colorEvolution * 50 + x * 3 + y * 5) % paletteColors.length;
+                                    ledState.color = this.hexToRgb(paletteColors[colorIndex]);
+                                }
+                            }
+                            
+                            // Update LED brightness with smooth transitions
+                            ledState.brightness += (ledState.targetBrightness - ledState.brightness) * 0.2;
+                            ledState.targetBrightness *= 0.94;
+                            ledState.dataIntensity *= 0.96;
+                            
+                            // Add subtle blinking
+                            const blinkOffset = Math.sin(this.matrixTime * 8 + ledState.blinkPhase) * 0.05;
+                            const finalBrightness = ledState.brightness + blinkOffset;
+                            
+                            // Draw LED with organic shapes and varied colors
+                            if (finalBrightness > 0.05) {
+                                // LED ON
+                                const intensity = Math.min(1, finalBrightness);
+                                
+                                // Calculate organic color based on position and emitter influence
+                                let r, g, b;
+                                if (ledState.isData) {
+                                    // Data flow uses current palette
+                                    r = ledState.color[0];
+                                    g = ledState.color[1];
+                                    b = ledState.color[2];
+                                } else if (cell && cell.type === 'emitter') {
+                                    // Emitter cells use their specific color
+                                    r = ledState.color[0];
+                                    g = ledState.color[1];
+                                    b = ledState.color[2];
+                                } else {
+                                    // Regular cells get organic base color influenced by nearby emitters
+                                    const baseHue = (x + y + this.colorEvolution * 10) % 360;
+                                    const hsl = this.hslToRgb(baseHue / 360, 0.8, 0.5);
+                                    r = hsl[0];
+                                    g = hsl[1];
+                                    b = hsl[2];
+                                }
+                                
+                                this.ctx.fillStyle = `rgba(${Math.floor(r * intensity)}, ${Math.floor(g * intensity)}, ${Math.floor(b * intensity)}, ${intensity})`;
+                                
+                                // Organic LED shapes
+                                const organicSize = this.matrix.cellSize - 1;
+                                const centerX = worldX + organicSize / 2;
+                                const centerY = worldY + organicSize / 2;
+                                
+                                // Create slightly organic rectangular LEDs
+                                const cornerRadius = Math.sin(this.matrixTime * 2 + x * 0.5 + y * 0.3) * 2 + 3;
+                                this.drawRoundedRect(worldX, worldY, organicSize, organicSize, cornerRadius);
+                                
+                                // Bright LED glow with color
+                                if (finalBrightness > 0.7) {
+                                    this.ctx.shadowBlur = 8 + intensity * 5;
+                                    this.ctx.shadowColor = `rgba(${Math.floor(r)}, ${Math.floor(g)}, ${Math.floor(b)}, ${intensity * 0.8})`;
+                                    this.drawRoundedRect(worldX, worldY, organicSize, organicSize, cornerRadius);
+                                    this.ctx.shadowBlur = 0;
+                                }
+                            } else {
+                                // LED OFF - varied dim background colors
+                                const dimHue = (x * 17 + y * 13) % 360;
+                                const dimHsl = this.hslToRgb(dimHue / 360, 0.3, 0.1);
+                                this.ctx.fillStyle = `rgba(${Math.floor(dimHsl[0])}, ${Math.floor(dimHsl[1])}, ${Math.floor(dimHsl[2])}, 0.3)`;
+                                this.ctx.fillRect(worldX, worldY, this.matrix.cellSize - 1, this.matrix.cellSize - 1);
+                            }
+                            
+                            // Reset data flag
+                            if (ledState.dataIntensity < 0.1) {
+                                ledState.isData = false;
+                            }
+                        }
+                    }
+                };
+                
+                // Create cascading data flow through LEDs
+                window.soundscape.createDataFlow = function(startX, startY) {
+                    const direction = Math.floor(Math.random() * 4);
+                    const length = 5 + Math.floor(Math.random() * 10);
+                    const dx = [1, 0, -1, 0][direction];
+                    const dy = [0, 1, 0, -1][direction];
+                    
+                    for (let i = 1; i <= length; i++) {
+                        const x = startX + dx * i;
+                        const y = startY + dy * i;
+                        
+                        if (x >= 0 && x < this.matrix.size && y >= 0 && y < this.matrix.size) {
+                            setTimeout(() => {
+                                const key = `${x},${y}`;
+                                if (this.ledBlinkStates.has(key)) {
+                                    const led = this.ledBlinkStates.get(key);
+                                    led.targetBrightness = 0.8 - (i / length) * 0.3;
+                                    led.isData = true;
+                                    led.dataIntensity = 1;
+                                }
+                            }, i * 25);
+                        }
+                    }
+                };
+                
+                // Draw organic tentacle connections
+                window.soundscape.drawTentacles = function() {
+                    this.tentacles.forEach(tentacle => {
+                        if (tentacle.segments.length < 2) return;
+                        
+                        const alpha = tentacle.life * 0.8;
+                        if (alpha < 0.05) return;
+                        
+                        // Draw main tentacle body
+                        this.ctx.strokeStyle = `rgba(${tentacle.color.join(',')}, ${alpha})`;
+                        this.ctx.lineWidth = tentacle.thickness * tentacle.life;
+                        this.ctx.lineCap = 'round';
+                        this.ctx.lineJoin = 'round';
+                        
+                        this.ctx.beginPath();
+                        tentacle.segments.forEach((segment, i) => {
+                            const x = segment.baseX + segment.offsetX;
+                            const y = segment.baseY + segment.offsetY;
+                            
+                            if (i === 0) {
+                                this.ctx.moveTo(x, y);
+                            } else {
+                                this.ctx.lineTo(x, y);
+                            }
+                        });
+                        this.ctx.stroke();
+                        
+                        // Draw flowing particles along tentacle
+                        if (tentacle.life > 0.5) {
+                            const flowParticles = 3;
+                            for (let i = 0; i < flowParticles; i++) {
+                                const progress = (this.matrixTime * 2 + i * 0.3) % 1;
+                                const segmentIndex = Math.floor(progress * (tentacle.segments.length - 1));
+                                const segment = tentacle.segments[segmentIndex];
+                                
+                                if (segment) {
+                                    const x = segment.baseX + segment.offsetX;
+                                    const y = segment.baseY + segment.offsetY;
+                                    
+                                    this.ctx.fillStyle = `rgba(${tentacle.color.join(',')}, ${alpha * 0.8})`;
+                                    this.ctx.beginPath();
+                                    this.ctx.arc(x, y, 2 + tentacle.thickness * 0.5, 0, Math.PI * 2);
+                                    this.ctx.fill();
+                                }
+                            }
+                        }
+                    });
+                };
+                
+                // Draw organic emitters
+                window.soundscape.drawEmitters = function() {
+                    // Emitters are already drawn as part of the matrix
+                    // This method can add additional emitter effects
+                    this.emitters.forEach(emitter => {
+                        if (emitter.energy > 0.7) {
+                            // Draw energy field around highly active emitters
+                            const fieldRadius = 30 + emitter.energy * 20;
+                            const fieldAlpha = (emitter.energy - 0.7) * 0.2;
+                            
+                            this.ctx.strokeStyle = `rgba(${emitter.color.join(',')}, ${fieldAlpha})`;
+                            this.ctx.lineWidth = 1;
+                            this.ctx.beginPath();
+                            this.ctx.arc(emitter.worldX, emitter.worldY, fieldRadius, 0, Math.PI * 2);
+                            this.ctx.stroke();
+                        }
+                    });
+                };
+                
+                // Draw particle bursts
+                window.soundscape.drawParticles = function() {
+                    this.particles.forEach(p => {
+                        const alpha = p.life / p.maxLife;
+                        
+                        // Draw particle trail
+                        if (p.trail.length > 1) {
+                            this.ctx.strokeStyle = `rgba(${p.color.join(',')}, ${alpha * 0.4})`;
+                            this.ctx.lineWidth = 1;
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(p.trail[0].x, p.trail[0].y);
+                            for (let i = 1; i < p.trail.length; i++) {
+                                this.ctx.lineTo(p.trail[i].x, p.trail[i].y);
+                            }
+                            this.ctx.stroke();
+                        }
+                        
+                        // Draw particle core
+                        this.ctx.fillStyle = `rgba(${p.color.join(',')}, ${alpha})`;
+                        this.ctx.beginPath();
+                        this.ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        
+                        // Draw glow for high-velocity particles
+                        const velocity = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+                        if (velocity > 3) {
+                            this.ctx.fillStyle = `rgba(255, 255, 255, ${alpha * velocity * 0.1})`;
+                            this.ctx.beginPath();
+                            this.ctx.arc(p.x, p.y, p.size * 2, 0, Math.PI * 2);
+                            this.ctx.fill();
+                        }
+                    });
+                };
+                
+                // GRID MANAGEMENT METHODS
+                
+                // Change grid configuration - UPDATED FOR DYNAMIC SIZING
+                window.soundscape.changeGridConfig = function(configName) {
+                    // Recalculate configs for current window size
+                    this.gridConfigs = this.calculateGridConfigs();
+                    
+                    if (!this.gridConfigs[configName]) return;
+                    
+                    const oldConfig = this.currentGridConfig;
+                    this.currentGridConfig = configName;
+                    const newConfig = this.gridConfigs[configName];
+                    
+                    // Smooth transition to new grid
+                    this.gridTransitionProgress = 0;
+                    
+                    // Update matrix configuration
+                    Object.assign(this.matrix, newConfig);
+                    this.matrix.centerX = this.visualCanvas.width / 2;
+                    this.matrix.centerY = this.visualCanvas.height / 2;
+                    
+                    // Reinitialize cells for new size
+                    this.matrix.cells.clear();
+                    this.ledBlinkStates.clear();
+                    
+                    for (let x = 0; x < this.matrix.size; x++) {
+                        for (let y = 0; y < this.matrix.size; y++) {
+                            this.matrix.cells.set(`${x},${y}`, {
+                                x: x, y: y, activity: 0, lastActivity: 0,
+                                color: [100, 255, 100], type: 'data',
+                                connections: [], pulse: Math.random() * Math.PI * 2
+                            });
+                        }
+                    }
+                    
+                    // Remap emitters to new grid
+                    this.remapEmitters();
+                    
+                    console.log(`Grid changed to: ${newConfig.name} (${newConfig.size}x${newConfig.size})`);
+                };
+                
+                // Draw parameter connections
+                window.soundscape.drawParameterConnections = function() {
+                    // Draw connection lines
+                    this.connectionLines.forEach(conn => {
+                        const alpha = conn.strength * 0.5;
+                        this.ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+                        this.ctx.lineWidth = 1 + conn.strength * 2;
+                        this.ctx.setLineDash([5, 10]);
+                        
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(conn.x1, conn.y1);
+                        this.ctx.lineTo(conn.x2, conn.y2);
+                        this.ctx.stroke();
+                        this.ctx.setLineDash([]);
+                    });
+                    
+                    // Draw connection pulses
+                    this.connectionPulses.forEach(pulse => {
+                        const x = pulse.x1 + (pulse.x2 - pulse.x1) * pulse.progress;
+                        const y = pulse.y1 + (pulse.y2 - pulse.y1) * pulse.progress;
+                        
+                        const alpha = pulse.strength * pulse.life;
+                        const paletteColors = this.colorPalettes[this.currentPalette];
+                        const colorIndex = Math.floor(pulse.progress * paletteColors.length) % paletteColors.length;
+                        const rgb = this.hexToRgb(paletteColors[colorIndex]);
+                        
+                        this.ctx.fillStyle = `rgba(${rgb.join(',')}, ${alpha})`;
+                        this.ctx.beginPath();
+                        this.ctx.arc(x, y, 3 + pulse.strength * 5, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        
+                        // Pulse glow
+                        this.ctx.shadowBlur = 10;
+                        this.ctx.shadowColor = `rgba(${rgb.join(',')}, ${alpha})`;
+                        this.ctx.fill();
+                        this.ctx.shadowBlur = 0;
+                    });
+                };
+                
+                // Cycle through color palettes
+                window.soundscape.cyclePalette = function() {
+                    const palettes = Object.keys(this.colorPalettes);
+                    const currentIndex = palettes.indexOf(this.currentPalette);
+                    const nextIndex = (currentIndex + 1) % palettes.length;
+                    this.currentPalette = palettes[nextIndex];
+                    this.paletteTransition = 1;
+                    console.log(`Palette changed to: ${this.currentPalette}`);
+                };
+                
+                // Random palette selection
+                window.soundscape.randomizePalette = function() {
+                    const palettes = Object.keys(this.colorPalettes);
+                    this.currentPalette = palettes[Math.floor(Math.random() * palettes.length)];
+                    this.paletteTransition = 1;
+                    console.log(`Random palette: ${this.currentPalette}`);
+                };
+                
+                // Adjust grid size dynamically
+                window.soundscape.adjustGridSize = function(factor) {
+                    this.matrix.cellSize = Math.max(4, Math.min(30, this.matrix.cellSize * factor));
+                    this.matrix.spacing = Math.max(0, Math.min(5, this.matrix.spacing * factor));
+                };
+                
+                // Remap emitters to new grid positions with organic distribution
+                window.soundscape.remapEmitters = function() {
+                    // Parameter positioning patterns - now more organic
+                    const positionPatterns = {
+                        'masterVolume': { x: 0.5, y: 0.5 },     // Center
+                        'reverb': { x: 0.2, y: 0.2 },          // Top-left
+                        'delay': { x: 0.8, y: 0.8 },           // Bottom-right
+                        'droneFreq': { x: 0.1, y: 0.7 },       // Bottom-left
+                        'glitchIntensity': { x: 0.9, y: 0.3 }, // Top-right
+                        'drumTempo': { x: 0.3, y: 0.1 },       // Top-center
+                        'bleepDensity': { x: 0.7, y: 0.1 },    // Top-right
+                        'burstActivity': { x: 0.1, y: 0.9 },   // Bottom-left
+                        'fmCarrier': { x: 0.6, y: 0.4 },       // Center-right
+                        'noiseLevel': { x: 0.4, y: 0.9 },      // Bottom-center
+                        'acidLevel': { x: 0.8, y: 0.6 },       // Right-center
+                        'grainDensity': { x: 0.2, y: 0.6 },    // Left-center
+                        'padDensity': { x: 0.6, y: 0.8 },      // Bottom-right
+                        'chordDensity': { x: 0.9, y: 0.5 },    // Right-center
+                        'vocalDensity': { x: 0.3, y: 0.3 }     // Top-left
+                    };
+                    
+                    this.emitters.forEach(emitter => {
+                        // Use proportional positioning based on parameter type
+                        const pattern = positionPatterns[emitter.name] || { x: Math.random(), y: Math.random() };
+                        
+                        // Add organic variation
+                        const organicOffsetX = Math.sin(this.matrixTime * 0.1 + emitter.name.length) * 0.05;
+                        const organicOffsetY = Math.cos(this.matrixTime * 0.13 + emitter.name.length) * 0.05;
+                        
+                        emitter.matrixX = Math.floor((pattern.x + organicOffsetX) * this.matrix.size);
+                        emitter.matrixY = Math.floor((pattern.y + organicOffsetY) * this.matrix.size);
+                        
+                        // Clamp to grid bounds
+                        emitter.matrixX = Math.max(0, Math.min(this.matrix.size - 1, emitter.matrixX));
+                        emitter.matrixY = Math.max(0, Math.min(this.matrix.size - 1, emitter.matrixY));
+                        
+                        // Update world position
+                        const startX = this.matrix.centerX - (this.matrix.size * (this.matrix.cellSize + this.matrix.spacing)) / 2;
+                        const startY = this.matrix.centerY - (this.matrix.size * (this.matrix.cellSize + this.matrix.spacing)) / 2;
+                        emitter.worldX = startX + emitter.matrixX * (this.matrix.cellSize + this.matrix.spacing) + this.matrix.cellSize / 2;
+                        emitter.worldY = startY + emitter.matrixY * (this.matrix.cellSize + this.matrix.spacing) + this.matrix.cellSize / 2;
+                        
+                        // Mark cell as emitter
+                        const cellKey = `${emitter.matrixX},${emitter.matrixY}`;
+                        if (this.matrix.cells.has(cellKey)) {
+                            const cell = this.matrix.cells.get(cellKey);
+                            cell.type = 'emitter';
+                            cell.color = emitter.color;
+                            cell.paramName = emitter.name;
+                        }
+                    });
+                };
+                
+                // Update color evolution over time - ENHANCED
+                window.soundscape.updateColorEvolution = function() {
+                    this.colorEvolution += this.colorCycleSpeed;
+                    this.paletteTransition *= 0.95;
+                    
+                    // More aggressive auto-cycling colors based on energy
+                    if (this.globalEnergy > 1.2 && Math.random() < 0.002) {
+                        this.cyclePalette();
+                    }
+                    
+                    // Auto-cycle every 20 seconds for visibility
+                    if (this.matrixTime % 20 < 0.02) {
+                        this.cyclePalette();
+                    }
+                    
+                    // Evolve ALL LED colors more dramatically
+                    this.ledBlinkStates.forEach((led, key) => {
+                        const coords = key.split(',');
+                        const x = parseInt(coords[0]);
+                        const y = parseInt(coords[1]);
+                        
+                        // Wave-based color evolution
+                        const wave1 = Math.sin(this.colorEvolution * 3 + x * 0.1 + y * 0.1);
+                        const wave2 = Math.cos(this.colorEvolution * 2 + x * 0.2 - y * 0.1);
+                        const colorIndex = Math.floor((wave1 + wave2 + 2) * 0.5 * this.colorPalettes[this.currentPalette].length) % this.colorPalettes[this.currentPalette].length;
+                        
+                        const hexColor = this.colorPalettes[this.currentPalette][colorIndex];
+                        led.color = this.hexToRgb(hexColor);
+                    });
+                    
+                    // Update parameter connections
+                    this.updateParameterConnections();
+                };
+                
+                // Update parameter connections based on activity
+                window.soundscape.updateParameterConnections = function() {
+                    this.connectionLines = [];
+                    this.connectionPulses = [];
+                    
+                    // Find active parameters
+                    const activeParams = this.emitters.filter(e => {
+                        const state = this.parameterStates.get(e.name);
+                        return state && state.activity > 0.3;
+                    });
+                    
+                    // Create connections between active parameters
+                    for (let i = 0; i < activeParams.length; i++) {
+                        for (let j = i + 1; j < activeParams.length; j++) {
+                            const param1 = activeParams[i];
+                            const param2 = activeParams[j];
+                            const state1 = this.parameterStates.get(param1.name);
+                            const state2 = this.parameterStates.get(param2.name);
+                            
+                            if (state1 && state2) {
+                                const connectionStrength = Math.min(state1.activity, state2.activity);
+                                const distance = Math.sqrt(
+                                    (param2.worldX - param1.worldX) ** 2 + 
+                                    (param2.worldY - param1.worldY) ** 2
+                                );
+                                
+                                // Only connect nearby parameters or very active ones
+                                if (distance < 300 || connectionStrength > 0.8) {
+                                    this.connectionLines.push({
+                                        x1: param1.worldX, y1: param1.worldY,
+                                        x2: param2.worldX, y2: param2.worldY,
+                                        strength: connectionStrength,
+                                        distance: distance,
+                                        param1: param1.name,
+                                        param2: param2.name
+                                    });
+                                    
+                                    // Create pulse along connection
+                                    this.connectionPulses.push({
+                                        x1: param1.worldX, y1: param1.worldY,
+                                        x2: param2.worldX, y2: param2.worldY,
+                                        progress: Math.random(),
+                                        speed: 0.02 + connectionStrength * 0.03,
+                                        strength: connectionStrength,
+                                        life: 1.0
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Update existing pulses
+                    this.connectionPulses.forEach(pulse => {
+                        pulse.progress += pulse.speed;
+                        pulse.life -= 0.01;
+                        if (pulse.progress > 1) pulse.progress = 0;
+                    });
+                    
+                    // Remove dead pulses
+                    this.connectionPulses = this.connectionPulses.filter(pulse => pulse.life > 0);
+                };
+                
+                // Update grid evolution and auto-resize
+                window.soundscape.updateGridEvolution = function() {
+                    this.matrix.autoResizeTimer += 0.016;
+                    
+                    if (this.gridAutoResize && this.matrix.autoResizeTimer > 30) { // Every 30 seconds
+                        this.matrix.autoResizeTimer = 0;
+                        
+                        // Auto-resize based on activity
+                        if (this.globalEnergy > 1.2) {
+                            const configs = ['large', 'fullscreen', 'ultrawide'];
+                            this.changeGridConfig(configs[Math.floor(Math.random() * configs.length)]);
+                        } else if (this.globalEnergy < 0.3) {
+                            const configs = ['small', 'medium'];
+                            this.changeGridConfig(configs[Math.floor(Math.random() * configs.length)]);
+                        } else {
+                            // Random layout change
+                            if (Math.random() < 0.3) {
+                                const configs = ['hexagon', 'circle'];
+                                this.changeGridConfig(configs[Math.floor(Math.random() * configs.length)]);
+                            }
+                        }
+                    }
+                };
+                
+                // Convert hex color to RGB array
+                window.soundscape.hexToRgb = function(hex) {
+                    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                    return result ? [
+                        parseInt(result[1], 16),
+                        parseInt(result[2], 16),
+                        parseInt(result[3], 16)
+                    ] : [0, 255, 0];
+                };
+                
+                // HSL to RGB conversion for organic colors
+                window.soundscape.hslToRgb = function(h, s, l) {
+                    const a = s * Math.min(l, 1 - l);
+                    const f = n => {
+                        const k = (n + h * 12) % 12;
+                        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+                        return Math.round(255 * color);
+                    };
+                    return [f(0), f(8), f(4)];
+                };
+                
+                // Draw rounded rectangle for organic LED shapes
+                window.soundscape.drawRoundedRect = function(x, y, width, height, radius) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x + radius, y);
+                    this.ctx.lineTo(x + width - radius, y);
+                    this.ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+                    this.ctx.lineTo(x + width, y + height - radius);
+                    this.ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                    this.ctx.lineTo(x + radius, y + height);
+                    this.ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+                    this.ctx.lineTo(x, y + radius);
+                    this.ctx.quadraticCurveTo(x, y, x + radius, y);
+                    this.ctx.closePath();
+                    this.ctx.fill();
+                };
+                
+                // VISUALIZATION MODE SYSTEM - Multiple dramatic variations
+                
+                // Initialize visualization mode system
+                window.soundscape.initVisualizationModes = function() {
+                    this.currentMode = 'matrix';
+                    this.modeTransition = 0;
+                    this.modeBlend = 1;
+                    this.modes = ['matrix', 'organic', 'glitch', 'wave', 'neural', 'particle', 'hybrid'];
+                    this.modeIndex = 0;
+                    this.autoModeChange = true;
+                    this.modeChangeTimer = 0;
+                    this.modeChangeDuration = 15; // Change mode every 15 seconds
+                    
+                    // Initialize all mode systems
+                    this.glitchSystem = {
+                        active: false,
+                        intensity: 0,
+                        frequency: 0.1,
+                        distortion: 0
+                    };
+                    
+                    this.flowSystem = {
+                        flows: [],
+                        emitterNodes: [],
+                        connections: [],
+                        evolution: 0,
+                        intensity: 0.5
+                    };
+                    
+                    this.neuralSystem = {
+                        neurons: [],
+                        connections: [],
+                        activity: new Map(),
+                        learning: false
+                    };
+                    
+                    this.waveSystem = {
+                        phase: 0,
+                        amplitude: 30,
+                        frequency: 0.1,
+                        layers: 8
+                    };
+                    
+                    this.explosionCenters = [];
+                };
+                
+                // Change visualization mode with dramatic effects
+                window.soundscape.changeVisualMode = function(mode) {
+                    console.log(`Switching to ${mode} mode`);
+                    const oldMode = this.currentMode;
+                    this.currentMode = mode;
+                    this.modeIndex = this.modes.indexOf(mode);
+                    this.modeTransition = 1;
+                    this.modeBlend = 0;
+                    
+                    // Mode-specific initializations
+                    switch(mode) {
+                        case 'glitch':
+                            this.glitchSystem.active = true;
+                            this.glitchSystem.intensity = 0.8;
+                            this.glitchSystem.frequency = 0.3;
+                            break;
+                        case 'organic':
+                            const flowData = this.generateOrganicFlows();
+                            this.flowSystem.flows = flowData.flows;
+                            this.flowSystem.emitterNodes = flowData.emitterNodes;
+                            this.flowSystem.connections = flowData.connections;
+                            break;
+                        case 'neural':
+                            this.neuralSystem.neurons = this.generateNeuralNetwork();
+                            this.neuralSystem.learning = true;
+                            break;
+                        case 'particle':
+                            this.explodeParticles();
+                            break;
+                        case 'wave':
+                            this.waveSystem.amplitude = 50;
+                            this.waveSystem.frequency = 0.1;
+                            break;
+                    }
+                };
+                
+                // Cycle through visualization modes
+                window.soundscape.cycleVisualMode = function() {
+                    this.modeIndex = (this.modeIndex + 1) % this.modes.length;
+                    this.changeVisualMode(this.modes[this.modeIndex]);
+                };
+                
+                // Trigger intense glitch effect
+                window.soundscape.triggerGlitchEffect = function() {
+                    console.log('Triggering glitch effect!');
+                    this.glitchSystem.active = true;
+                    this.glitchSystem.intensity = 1.5;
+                    this.glitchSystem.frequency = 0.8;
+                    this.glitchSystem.distortion = 1;
+                    
+                    // Visual corruption
+                    const corruption = () => {
+                        if (!this.visualActive) return;
+                        
+                        this.ctx.save();
+                        this.ctx.globalCompositeOperation = Math.random() > 0.5 ? 'multiply' : 'screen';
+                        this.ctx.fillStyle = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                        
+                        // Random corruption patterns
+                        for (let i = 0; i < 10; i++) {
+                            const x = Math.random() * this.visualCanvas.width;
+                            const y = Math.random() * this.visualCanvas.height;
+                            const w = Math.random() * 200;
+                            const h = Math.random() * 20;
+                            this.ctx.fillRect(x, y, w, h);
+                        }
+                        this.ctx.restore();
+                    };
+                    
+                    // Multiple corruption frames
+                    for (let i = 0; i < 15; i++) {
+                        setTimeout(corruption, i * 50);
+                    }
+                    
+                    // Reset glitch after effect
+                    setTimeout(() => {
+                        this.glitchSystem.intensity *= 0.3;
+                        this.glitchSystem.frequency *= 0.5;
+                        this.glitchSystem.distortion = 0;
+                    }, 2000);
+                };
+                
+                // Get parameter color based on type
+                window.soundscape.getParameterColor = function(paramName) {
+                    if (paramName.includes('Density') || paramName.includes('Activity')) return [255, 255, 255]; // White
+                    if (paramName.includes('Freq') || paramName.includes('Frequency')) return [255, 100, 100]; // Red
+                    if (paramName.includes('Tempo') || paramName.includes('Speed') || paramName.includes('Rate')) return [100, 255, 100]; // Green
+                    if (paramName.includes('Attack') || paramName.includes('Decay') || paramName.includes('Sustain') || paramName.includes('Release')) return [100, 100, 255]; // Blue
+                    if (paramName.includes('Filter') || paramName.includes('Resonance')) return [255, 255, 100]; // Yellow
+                    if (paramName.includes('LFO') || paramName.includes('Modulation')) return [255, 100, 255]; // Magenta
+                    return [150, 150, 150]; // Default gray
+                };
+                
+                // Convert hex color to RGB array
+                window.soundscape.hexToRgb = function(hex) {
+                    if (!hex) return [150, 150, 150];
+                    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                    return result ? [
+                        parseInt(result[1], 16),
+                        parseInt(result[2], 16),
+                        parseInt(result[3], 16)
+                    ] : [150, 150, 150];
+                };
+                
+                // Generate organic flow patterns
+                window.soundscape.generateOrganicFlows = function() {
+                    const flows = [];
+                    const emitterNodes = [];
+                    const connections = [];
+                    
+                    // Generate emitter nodes based on active parameters
+                    const activeParams = Array.from(this.parameterStates.entries())
+                        .filter(([name, state]) => state.activity > 0.1)
+                        .slice(0, 8); // Limit to 8 most active parameters
+                    
+                    activeParams.forEach(([paramName, state], index) => {
+                        const angle = (index / activeParams.length) * Math.PI * 2;
+                        const radius = 150 + Math.random() * 100;
+                        const centerX = this.visualCanvas.width / 2;
+                        const centerY = this.visualCanvas.height / 2;
+                        
+                        const emitter = {
+                            x: centerX + Math.cos(angle) * radius,
+                            y: centerY + Math.sin(angle) * radius,
+                            paramName: paramName,
+                            activity: state.activity,
+                            radius: 20 + state.activity * 30,
+                            color: this.getParameterColor(paramName),
+                            pulse: 0,
+                            trails: []
+                        };
+                        
+                        emitterNodes.push(emitter);
+                    });
+                    
+                    // Generate fewer, cleaner connections between emitters
+                    emitterNodes.forEach((emitter, i) => {
+                        emitterNodes.forEach((target, j) => {
+                            if (i !== j && Math.random() < 0.15) { // Reduced from 0.3 to 0.15
+                                connections.push({
+                                    source: emitter,
+                                    target: target,
+                                    strength: Math.random() * 0.5 + 0.3, // More consistent strength
+                                    flow: 0,
+                                    particles: []
+                                });
+                            }
+                        });
+                    });
+                    
+                    // Generate fewer organic flow patterns for cleaner look
+                    for (let i = 0; i < 8; i++) { // Reduced from 20 to 8
+                        flows.push({
+                            x: Math.random() * this.visualCanvas.width,
+                            y: Math.random() * this.visualCanvas.height,
+                            vx: (Math.random() - 0.5) * 2,
+                            vy: (Math.random() - 0.5) * 2,
+                            life: Math.random() * 100 + 50,
+                            maxLife: Math.random() * 100 + 50,
+                            size: Math.random() * 8 + 2,
+                            color: this.hexToRgb(this.colorPalettes[this.currentPalette][Math.floor(Math.random() * this.colorPalettes[this.currentPalette].length)])
+                        });
+                    }
+                    
+                    return { flows, emitterNodes, connections };
+                };
+                
+                // Trigger organic flow burst
+                window.soundscape.triggerOrganicBurst = function() {
+                    console.log('Organic flow burst!');
+                    const flowData = this.generateOrganicFlows();
+                    this.flowSystem.flows = flowData.flows;
+                    this.flowSystem.emitterNodes = flowData.emitterNodes;
+                    this.flowSystem.connections = flowData.connections;
+                    this.flowSystem.intensity = 2;
+                    
+                    // Animate the burst
+                    const animate = () => {
+                        this.flowSystem.intensity *= 0.95;
+                        this.flowSystem.evolution += 0.1;
+                        
+                        // Add fewer particles during burst for cleaner performance
+                        if (this.flowSystem.intensity > 0.3) {
+                            for (let i = 0; i < 2; i++) { // Reduced from 5 to 2
+                                this.flowSystem.flows.push({
+                                    x: Math.random() * this.visualCanvas.width,
+                                    y: Math.random() * this.visualCanvas.height,
+                                    vx: (Math.random() - 0.5) * 4,
+                                    vy: (Math.random() - 0.5) * 4,
+                                    life: Math.random() * 50 + 25,
+                                    maxLife: Math.random() * 50 + 25,
+                                    size: Math.random() * 6 + 2,
+                                    color: this.hexToRgb(this.colorPalettes[this.currentPalette][Math.floor(Math.random() * this.colorPalettes[this.currentPalette].length)])
+                                });
+                            }
+                        }
+                        
+                        // Stop when intensity is low
+                        if (this.flowSystem.intensity > 0.3 && this.visualActive) {
+                            setTimeout(animate, 50);
+                        }
+                    };
+                    animate();
+                };
+                
+                // Generate neural network
+                window.soundscape.generateNeuralNetwork = function() {
+                    const neurons = [];
+                    const layers = [4, 6, 4]; // Simplified from [8, 12, 10, 6, 4] to [4, 6, 4]
+                    const width = this.visualCanvas.width;
+                    const height = this.visualCanvas.height;
+                    
+                    layers.forEach((count, layerIndex) => {
+                        const layerX = (width / (layers.length - 1)) * layerIndex;
+                        for (let i = 0; i < count; i++) {
+                            const neuronY = (height / (count + 1)) * (i + 1);
+                            neurons.push({
+                                x: layerX,
+                                y: neuronY,
+                                layer: layerIndex,
+                                activation: Math.random(),
+                                connections: [],
+                                bias: (Math.random() - 0.5) * 2
+                            });
+                        }
+                    });
+                    
+                    // Connect neurons between adjacent layers (partial connections for performance)
+                    neurons.forEach(neuron => {
+                        if (neuron.layer < layers.length - 1) {
+                            const nextLayer = neurons.filter(n => n.layer === neuron.layer + 1);
+                            nextLayer.forEach(target => {
+                                // Only create connection 60% of the time for cleaner, less dense network
+                                if (Math.random() < 0.6) {
+                                    neuron.connections.push({
+                                        target: target,
+                                        weight: (Math.random() - 0.5) * 1.5, // Reduced weight range
+                                        strength: Math.random() * 0.8 + 0.2 // More consistent strength
+                                    });
+                                }
+                            });
+                        }
+                    });
+                    
+                    return neurons;
+                };
+                
+                // Explode particles dramatically
+                window.soundscape.explodeParticles = function() {
+                    console.log('Particle explosion!');
+                    
+                    // Clear existing particles first
+                    this.particles = [];
+                    
+                    // Reduced explosion centers for cleaner performance
+                    const explosionCenters = [
+                        { x: this.visualCanvas.width * 0.3, y: this.visualCanvas.height * 0.4 },
+                        { x: this.visualCanvas.width * 0.7, y: this.visualCanvas.height * 0.6 }
+                    ];
+                    
+                    explosionCenters.forEach((center, explosionIndex) => {
+                        const particleCount = 30 + Math.random() * 20; // Reduced from 150-250 to 30-50
+                        const colors = this.colorPalettes[this.currentPalette];
+                        
+                        for (let i = 0; i < particleCount; i++) {
+                            const angle = Math.random() * Math.PI * 2;
+                            const speed = 3 + Math.random() * 12;
+                            const hexColor = colors[Math.floor(Math.random() * colors.length)];
+                            const color = this.hexToRgb(hexColor);
+                            
+                            this.particles.push({
+                                x: center.x + (Math.random() - 0.5) * 40,
+                                y: center.y + (Math.random() - 0.5) * 40,
+                                vx: Math.cos(angle) * speed,
+                                vy: Math.sin(angle) * speed,
+                                life: 80 + Math.random() * 120,
+                                maxLife: 200,
+                                size: 1 + Math.random() * 4,
+                                color: color,
+                                type: 'explosion',
+                                trail: [],
+                                gravity: 0.1,
+                                bounce: 0.7,
+                                sparkle: Math.random() > 0.7,
+                                spiral: Math.random() > 0.8,
+                                explosionId: explosionIndex
+                            });
+                        }
+                    });
+                    
+                    // Add gravitational interaction between explosion centers
+                    this.explosionCenters = explosionCenters;
+                };
+                
+                // Update visualization based on current mode
+                window.soundscape.updateModeSpecific = function() {
+                    // Safety check - initialize if not already done
+                    if (!this.glitchSystem) {
+                        this.initVisualizationModes();
+                    }
+                    
+                    // Auto mode changing
+                    if (this.autoModeChange) {
+                        this.modeChangeTimer += 0.016; // Add frame time
+                        
+                        if (this.modeChangeTimer > this.modeChangeDuration) {
+                            this.modeChangeTimer = 0;
+                            
+                            // Energy-responsive mode selection
+                            if (this.globalEnergy > 1.5) {
+                                // High energy - prefer dynamic modes
+                                const highEnergyModes = ['glitch', 'particle', 'organic', 'hybrid'];
+                                const selectedMode = highEnergyModes[Math.floor(Math.random() * highEnergyModes.length)];
+                                this.changeVisualMode(selectedMode);
+                            } else if (this.globalEnergy < 0.3) {
+                                // Low energy - prefer calm modes
+                                const lowEnergyModes = ['matrix', 'organic', 'wave', 'neural'];
+                                const selectedMode = lowEnergyModes[Math.floor(Math.random() * lowEnergyModes.length)];
+                                this.changeVisualMode(selectedMode);
+                            } else {
+                                // Normal cycling
+                                this.cycleVisualMode();
+                            }
+                            
+                            // Vary the duration based on energy for more organic timing
+                            const energyMultiplier = 1 + (this.globalEnergy * 0.5);
+                            this.modeChangeDuration = (10 + Math.random() * 20) / energyMultiplier; // 5-30 seconds
+                            
+                            // Energy-responsive special effects during mode changes
+                            const effectChance = 0.2 + (this.globalEnergy * 0.4); // 20-60% chance
+                            if (Math.random() < effectChance) {
+                                setTimeout(() => {
+                                    if (Math.random() < 0.4) this.triggerGlitchEffect();
+                                    if (Math.random() < 0.3) this.triggerOrganicBurst();
+                                    if (Math.random() < 0.4) this.explodeParticles();
+                                }, 500 + Math.random() * 2000);
+                            }
+                        }
+                    }
+                    
+                    this.modeTransition *= 0.95;
+                    this.modeBlend = Math.min(1, this.modeBlend + 0.02);
+                    
+                    switch(this.currentMode) {
+                        case 'glitch':
+                            this.updateGlitchMode();
+                            break;
+                        case 'organic':
+                            this.updateOrganicFlowMode();
+                            break;
+                        case 'neural':
+                            this.updateNeuralMode();
+                            break;
+                        case 'wave':
+                            this.updateWaveMode();
+                            break;
+                        case 'particle':
+                            this.updateParticleMode();
+                            break;
+                        case 'organic':
+                            this.updateOrganicMode();
+                            break;
+                        case 'hybrid':
+                            this.updateHybridMode();
+                            break;
+                    }
+                };
+                
+                // Mode-specific update methods
+                window.soundscape.updateGlitchMode = function() {
+                    if (this.glitchSystem.active) {
+                        this.glitchSystem.intensity *= 0.995;
+                        this.glitchSystem.frequency *= 0.99;
+                        
+                        if (Math.random() < this.glitchSystem.frequency) {
+                            // Data corruption effects
+                            this.matrix.cells.forEach((cell, key) => {
+                                if (Math.random() < 0.1) {
+                                    cell.color = [
+                                        Math.random() * 255,
+                                        Math.random() * 255,
+                                        Math.random() * 255
+                                    ];
+                                    cell.activity = Math.random();
+                                }
+                            });
+                        }
+                    }
+                };
+                
+                window.soundscape.updateOrganicFlowMode = function() {
+                    this.flowSystem.evolution += 0.02;
+                    
+                    // Update emitter nodes based on parameter activity
+                    this.flowSystem.emitterNodes.forEach(emitter => {
+                        const state = this.parameterStates.get(emitter.paramName);
+                        if (state) {
+                            emitter.activity = state.activity;
+                            emitter.radius = 20 + state.activity * 30;
+                            emitter.pulse += 0.1 + state.activity * 0.2;
+                            
+                            // Add LFO responsiveness
+                            if (this.lfoControllers && this.lfoControllers.has(emitter.paramName)) {
+                                const lfoController = this.lfoControllers.get(emitter.paramName);
+                                if (lfoController.isActive) {
+                                    emitter.radius += Math.sin(lfoController.phase || 0) * 10;
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Update connections
+                    this.flowSystem.connections.forEach(connection => {
+                        connection.flow += 0.05;
+                        
+                        // Add fewer particles along connections for cleaner performance
+                        if (connection.source.activity > 0.4 && Math.random() < 0.05) { // Reduced frequency and higher threshold
+                            connection.particles.push({
+                                t: 0,
+                                life: 60 + Math.random() * 40,
+                                maxLife: 60 + Math.random() * 40,
+                                size: 2 + Math.random() * 4
+                            });
+                        }
+                        
+                        // Update particles
+                        connection.particles = connection.particles.filter(particle => {
+                            particle.t += 0.02;
+                            particle.life--;
+                            return particle.life > 0 && particle.t < 1;
+                        });
+                    });
+                    
+                    // Update flow particles
+                    this.flowSystem.flows.forEach(flow => {
+                        // Organic movement influenced by nearby emitters
+                        let nearestEmitter = null;
+                        let nearestDistance = Infinity;
+                        
+                        this.flowSystem.emitterNodes.forEach(emitter => {
+                            const dx = emitter.x - flow.x;
+                            const dy = emitter.y - flow.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            
+                            if (distance < nearestDistance) {
+                                nearestDistance = distance;
+                                nearestEmitter = emitter;
+                            }
+                        });
+                        
+                        // Apply attraction to nearest emitter
+                        if (nearestEmitter && nearestDistance < 200) {
+                            const attraction = (200 - nearestDistance) / 200 * 0.02;
+                            const dx = nearestEmitter.x - flow.x;
+                            const dy = nearestEmitter.y - flow.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            
+                            if (distance > 0) {
+                                flow.vx += (dx / distance) * attraction;
+                                flow.vy += (dy / distance) * attraction;
+                            }
+                        }
+                        
+                        // Apply organic drift
+                        flow.vx += (Math.random() - 0.5) * 0.2;
+                        flow.vy += (Math.random() - 0.5) * 0.2;
+                        
+                        // Damping
+                        flow.vx *= 0.95;
+                        flow.vy *= 0.95;
+                        
+                        // Update position
+                        flow.x += flow.vx;
+                        flow.y += flow.vy;
+                        
+                        // Wrap around screen
+                        if (flow.x < 0) flow.x = this.visualCanvas.width;
+                        if (flow.x > this.visualCanvas.width) flow.x = 0;
+                        if (flow.y < 0) flow.y = this.visualCanvas.height;
+                        if (flow.y > this.visualCanvas.height) flow.y = 0;
+                        
+                        // Age and fade
+                        flow.life--;
+                        if (flow.life <= 0) {
+                            // Regenerate
+                            flow.life = flow.maxLife;
+                            flow.x = Math.random() * this.visualCanvas.width;
+                            flow.y = Math.random() * this.visualCanvas.height;
+                            flow.vx = (Math.random() - 0.5) * 2;
+                            flow.vy = (Math.random() - 0.5) * 2;
+                        }
+                    });
+                };
+                
+                window.soundscape.updateNeuralMode = function() {
+                    if (this.neuralSystem.neurons.length > 0) {
+                        // Update neuron activations based on audio parameters and LFO states
+                        this.neuralSystem.neurons.forEach(neuron => {
+                            if (neuron.layer === 0) {
+                                // Input layer gets data from parameters with enhanced responsiveness
+                                const paramNames = Array.from(this.parameterStates.keys());
+                                if (paramNames.length > 0) {
+                                    const paramIndex = Math.floor((neuron.y / this.visualCanvas.height) * paramNames.length);
+                                    const paramName = paramNames[paramIndex];
+                                    const state = this.parameterStates.get(paramName);
+                                    
+                                    if (state) {
+                                        // Base activation from parameter activity
+                                        let activation = state.activity;
+                                        
+                                        // Enhanced activation for LFO-controlled parameters
+                                        if (window.soundscape.lfoControllers && window.soundscape.lfoControllers.has(paramName)) {
+                                            const lfoController = window.soundscape.lfoControllers.get(paramName);
+                                            if (lfoController.isActive) {
+                                                activation = Math.max(activation, Math.abs(lfoController.currentValue) * 0.8);
+                                            }
+                                        }
+                                        
+                                        // Add velocity-based activation for rapid parameter changes
+                                        activation = Math.max(activation, Math.min(state.velocity * 2, 1));
+                                        
+                                        // Smooth activation changes for more organic movement
+                                        neuron.activation = neuron.activation * 0.8 + activation * 0.2;
+                                        
+                                        // Add pulsing for active parameters
+                                        if (activation > 0.3) {
+                                            neuron.activation += Math.sin(this.matrixTime * 0.1) * 0.1 * activation;
+                                        }
+                                    }
+                                }
+                            } else {
+                                // Enhanced forward propagation with dynamic weights
+                                let sum = neuron.bias;
+                                this.neuralSystem.neurons.forEach(inputNeuron => {
+                                    if (inputNeuron.layer === neuron.layer - 1) {
+                                        const connection = inputNeuron.connections.find(c => c.target === neuron);
+                                        if (connection) {
+                                            // Dynamic connection strength based on input activity
+                                            const dynamicWeight = connection.weight * (0.5 + inputNeuron.activation * 0.5);
+                                            sum += inputNeuron.activation * dynamicWeight;
+                                        }
+                                    }
+                                });
+                                
+                                // Enhanced sigmoid with dynamic range
+                                const newActivation = 1 / (1 + Math.exp(-sum * 2));
+                                neuron.activation = neuron.activation * 0.7 + newActivation * 0.3;
+                                
+                                // Add audio-reactive ripples
+                                if (Math.random() < 0.1 && neuron.activation > 0.5) {
+                                    neuron.ripple = { strength: neuron.activation, phase: 0 };
+                                }
+                            }
+                            
+                            // Update ripple effects
+                            if (neuron.ripple) {
+                                neuron.ripple.phase += 0.2;
+                                neuron.ripple.strength *= 0.95;
+                                if (neuron.ripple.strength < 0.01) {
+                                    delete neuron.ripple;
+                                }
+                            }
+                        });
+                    }
+                };
+                
+                window.soundscape.updateWaveMode = function() {
+                    this.waveSystem.phase += 0.05;
+                    this.waveSystem.amplitude = 30 + this.globalEnergy * 50;
+                };
+                
+                window.soundscape.updateParticleMode = function() {
+                    // Enhanced particle physics for particle mode
+                    this.particles.forEach(particle => {
+                        if (particle.type === 'explosion') {
+                            // Apply gravity
+                            particle.vy += particle.gravity;
+                            
+                            // Spiral motion for some particles
+                            if (particle.spiral && this.explosionCenters && this.explosionCenters[particle.explosionId]) {
+                                const spiralForce = 0.2;
+                                const centerX = this.explosionCenters[particle.explosionId].x;
+                                const centerY = this.explosionCenters[particle.explosionId].y;
+                                const dx = particle.x - centerX;
+                                const dy = particle.y - centerY;
+                                particle.vx += -dy * spiralForce * 0.01;
+                                particle.vy += dx * spiralForce * 0.01;
+                            }
+                            
+                            // Sparkle effect
+                            if (particle.sparkle && Math.random() < 0.1) {
+                                particle.size = Math.max(1, particle.size + (Math.random() - 0.5) * 2);
+                            }
+                            
+                            // Boundary bouncing
+                            if (particle.x < 0 || particle.x > this.visualCanvas.width) {
+                                particle.vx *= -particle.bounce;
+                                particle.x = Math.max(0, Math.min(this.visualCanvas.width, particle.x));
+                            }
+                            if (particle.y > this.visualCanvas.height) {
+                                particle.vy *= -particle.bounce;
+                                particle.y = this.visualCanvas.height;
+                            }
+                        }
+                    });
+                };
+                
+                window.soundscape.updateOrganicMode = function() {
+                    // Enhanced organic flowing effects
+                    this.matrix.cells.forEach((cell, key) => {
+                        const wave1 = Math.sin(this.matrixTime * 0.5 + cell.x * 0.2 + cell.y * 0.15);
+                        const wave2 = Math.cos(this.matrixTime * 0.3 + cell.x * 0.15 + cell.y * 0.2);
+                        const organicActivity = (wave1 + wave2) * 0.3 + 0.3;
+                        cell.activity = Math.max(cell.activity, organicActivity);
+                    });
+                };
+                
+                window.soundscape.updateHybridMode = function() {
+                    // Blend multiple modes
+                    this.updateOrganicMode();
+                    if (Math.random() < 0.3) this.updateGlitchMode();
+                    if (Math.random() < 0.08) this.updateOrganicFlowMode(); // Reduced organic flow updates for performance
+                    if (Math.random() < 0.2) this.updateWaveMode();
+                };
+                
+                // Render mode-specific effects
+                window.soundscape.renderModeEffects = function() {
+                    switch(this.currentMode) {
+                        case 'organic':
+                            this.renderOrganicFlows();
+                            break;
+                        case 'neural':
+                            this.renderNeuralNetwork();
+                            break;
+                        case 'wave':
+                            this.renderWaveEffects();
+                            break;
+                        case 'glitch':
+                            this.renderGlitchEffects();
+                            break;
+                    }
+                };
+                
+                // Render organic flow patterns
+                window.soundscape.renderOrganicFlows = function() {
+                    // Render connections first
+                    this.flowSystem.connections.forEach(connection => {
+                        const alpha = connection.strength * connection.source.activity * 0.5;
+                        
+                        // Create flowing gradient line
+                        const gradient = this.ctx.createLinearGradient(
+                            connection.source.x, connection.source.y,
+                            connection.target.x, connection.target.y
+                        );
+                        gradient.addColorStop(0, `rgba(${connection.source.color.join(',')}, ${alpha})`);
+                        gradient.addColorStop(1, `rgba(${connection.target.color.join(',')}, ${alpha})`);
+                        
+                        this.ctx.strokeStyle = gradient;
+                        this.ctx.lineWidth = 2 + connection.strength * 3;
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(connection.source.x, connection.source.y);
+                        this.ctx.lineTo(connection.target.x, connection.target.y);
+                        this.ctx.stroke();
+                        
+                        // Render flowing particles along connections
+                        connection.particles.forEach(particle => {
+                            const x = connection.source.x + (connection.target.x - connection.source.x) * particle.t;
+                            const y = connection.source.y + (connection.target.y - connection.source.y) * particle.t;
+                            const life = particle.life / particle.maxLife;
+                            
+                            this.ctx.fillStyle = `rgba(255,255,255,${life})`;
+                            this.ctx.beginPath();
+                            this.ctx.arc(x, y, particle.size * life, 0, Math.PI * 2);
+                            this.ctx.fill();
+                        });
+                    });
+                    
+                    // Render emitter nodes
+                    this.flowSystem.emitterNodes.forEach(emitter => {
+                        const pulseRadius = emitter.radius * (1 + Math.sin(emitter.pulse) * 0.2);
+                        
+                        // Outer glow
+                        const glowGradient = this.ctx.createRadialGradient(
+                            emitter.x, emitter.y, 0,
+                            emitter.x, emitter.y, pulseRadius * 2
+                        );
+                        glowGradient.addColorStop(0, `rgba(${emitter.color.join(',')}, 0.3)`);
+                        glowGradient.addColorStop(1, `rgba(${emitter.color.join(',')}, 0)`);
+                        
+                        this.ctx.fillStyle = glowGradient;
+                        this.ctx.beginPath();
+                        this.ctx.arc(emitter.x, emitter.y, pulseRadius * 2, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        
+                        // Inner core
+                        this.ctx.fillStyle = `rgba(${emitter.color.join(',')}, 0.8)`;
+                        this.ctx.beginPath();
+                        this.ctx.arc(emitter.x, emitter.y, pulseRadius * 0.6, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        
+                        // Highlight
+                        this.ctx.fillStyle = `rgba(255,255,255,${emitter.activity})`;
+                        this.ctx.beginPath();
+                        this.ctx.arc(emitter.x, emitter.y, pulseRadius * 0.3, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    });
+                    
+                    // Render flow particles
+                    this.flowSystem.flows.forEach(flow => {
+                        const life = flow.life / flow.maxLife;
+                        const size = flow.size * life;
+                        
+                        // Simplified trailing effect for performance
+                        for (let i = 0; i < 2; i++) { // Reduced from 3 to 2 trails
+                            const trailX = flow.x - flow.vx * i * 2;
+                            const trailY = flow.y - flow.vy * i * 2;
+                            const trailAlpha = life * (1 - i * 0.3);
+                            
+                            this.ctx.fillStyle = `rgba(${flow.color.join(',')}, ${trailAlpha})`;
+                            this.ctx.beginPath();
+                            this.ctx.arc(trailX, trailY, size * (1 - i * 0.2), 0, Math.PI * 2);
+                            this.ctx.fill();
+                        }
+                    });
+                };
+                
+                // Render Mandelbrot set
+                window.soundscape.renderMandelbrot = function(pattern) {
+                    const imageData = this.ctx.createImageData(pattern.size, pattern.size);
+                    const data = imageData.data;
+                    
+                    for (let px = 0; px < pattern.size; px++) {
+                        for (let py = 0; py < pattern.size; py++) {
+                            const x0 = (px - pattern.size/2) / (pattern.size/4) + pattern.cx;
+                            const y0 = (py - pattern.size/2) / (pattern.size/4) + pattern.cy;
+                            
+                            let x = 0, y = 0;
+                            let iteration = 0;
+                            const maxIteration = 100;
+                            
+                            while (x*x + y*y <= 4 && iteration < maxIteration) {
+                                const xtemp = x*x - y*y + x0;
+                                y = 2*x*y + y0;
+                                x = xtemp;
+                                iteration++;
+                            }
+                            
+                            const i = (py * pattern.size + px) * 4;
+                            if (iteration < maxIteration) {
+                                const color = Math.floor(255 * iteration / maxIteration);
+                                data[i] = color;
+                                data[i + 1] = color * 0.5;
+                                data[i + 2] = color * 0.8;
+                                data[i + 3] = pattern.alpha;
+                            } else {
+                                data[i] = 0;
+                                data[i + 1] = 0;
+                                data[i + 2] = 0;
+                                data[i + 3] = pattern.alpha;
+                            }
+                        }
+                    }
+                    
+                    this.ctx.putImageData(imageData, -pattern.size/2, -pattern.size/2);
+                };
+                
+                // Draw Sierpinski triangle
+                window.soundscape.drawSierpinski = function(x, y, size, depth) {
+                    if (depth === 0) {
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(x, y - size/2);
+                        this.ctx.lineTo(x - size/2, y + size/2);
+                        this.ctx.lineTo(x + size/2, y + size/2);
+                        this.ctx.closePath();
+                        this.ctx.stroke();
+                    } else {
+                        const newSize = size / 2;
+                        this.drawSierpinski(x, y - size/4, newSize, depth - 1);
+                        this.drawSierpinski(x - size/4, y + size/4, newSize, depth - 1);
+                        this.drawSierpinski(x + size/4, y + size/4, newSize, depth - 1);
+                    }
+                };
+                
+                // Render neural network
+                window.soundscape.renderNeuralNetwork = function() {
+                    if (this.neuralSystem.neurons.length === 0) return;
+                    
+                    // Draw connections with enhanced dynamics
+                    this.neuralSystem.neurons.forEach(neuron => {
+                        neuron.connections.forEach(connection => {
+                            const baseAlpha = Math.abs(connection.weight) * connection.strength * neuron.activation;
+                            const color = connection.weight > 0 ? '0,255,0' : '255,0,0';
+                            
+                            // Add pulsing effect for active connections
+                            const pulse = 1 + Math.sin(this.matrixTime * 0.1 + connection.target.x * 0.01) * 0.3;
+                            const alpha = Math.min(baseAlpha * pulse, 1);
+                            
+                            this.ctx.strokeStyle = `rgba(${color}, ${alpha})`;
+                            this.ctx.lineWidth = Math.abs(connection.weight) * 2 * (0.5 + neuron.activation * 0.5);
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(neuron.x, neuron.y);
+                            this.ctx.lineTo(connection.target.x, connection.target.y);
+                            this.ctx.stroke();
+                            
+                            // Add flowing particles along active connections
+                            if (alpha > 0.3) {
+                                const t = (this.matrixTime * 0.05 + connection.target.x * 0.001) % 1;
+                                const particleX = neuron.x + (connection.target.x - neuron.x) * t;
+                                const particleY = neuron.y + (connection.target.y - neuron.y) * t;
+                                
+                                this.ctx.fillStyle = `rgba(${color}, ${alpha})`;
+                                this.ctx.beginPath();
+                                this.ctx.arc(particleX, particleY, 2, 0, Math.PI * 2);
+                                this.ctx.fill();
+                            }
+                        });
+                    });
+                    
+                    // Draw neurons with enhanced visual feedback
+                    this.neuralSystem.neurons.forEach(neuron => {
+                        const baseRadius = 8 + neuron.activation * 12;
+                        const intensity = neuron.activation * 255;
+                        
+                        // Add ripple effect
+                        if (neuron.ripple) {
+                            const rippleRadius = baseRadius + Math.sin(neuron.ripple.phase) * 20 * neuron.ripple.strength;
+                            const rippleAlpha = neuron.ripple.strength * 0.3;
+                            
+                            this.ctx.strokeStyle = `rgba(255,255,255,${rippleAlpha})`;
+                            this.ctx.lineWidth = 1;
+                            this.ctx.beginPath();
+                            this.ctx.arc(neuron.x, neuron.y, rippleRadius, 0, Math.PI * 2);
+                            this.ctx.stroke();
+                        }
+                        
+                        // Main neuron body with layered colors
+                        const layerColors = [
+                            `rgba(${intensity}, ${intensity/3}, ${255-intensity}, 0.8)`,
+                            `rgba(${intensity}, ${intensity/2}, ${255-intensity}, 0.6)`,
+                            `rgba(255, 255, 255, ${neuron.activation})`
+                        ];
+                        
+                        layerColors.forEach((color, i) => {
+                            const radius = baseRadius * (1 - i * 0.3);
+                            this.ctx.fillStyle = color;
+                            this.ctx.beginPath();
+                            this.ctx.arc(neuron.x, neuron.y, radius, 0, Math.PI * 2);
+                            this.ctx.fill();
+                        });
+                        
+                        // Add glow effect for highly active neurons
+                        if (neuron.activation > 0.7) {
+                            const glowRadius = baseRadius * 2;
+                            const gradient = this.ctx.createRadialGradient(
+                                neuron.x, neuron.y, 0, 
+                                neuron.x, neuron.y, glowRadius
+                            );
+                            gradient.addColorStop(0, `rgba(255,255,255,${neuron.activation * 0.3})`);
+                            gradient.addColorStop(1, 'rgba(255,255,255,0)');
+                            
+                            this.ctx.fillStyle = gradient;
+                            this.ctx.beginPath();
+                            this.ctx.arc(neuron.x, neuron.y, glowRadius, 0, Math.PI * 2);
+                            this.ctx.fill();
+                        }
+                    });
+                };
+                
+                // Render wave effects
+                window.soundscape.renderWaveEffects = function() {
+                    const waves = 8;
+                    for (let w = 0; w < waves; w++) {
+                        this.ctx.strokeStyle = `hsl(${(w * 45 + this.matrixTime * 10) % 360}, 80%, 60%)`;
+                        this.ctx.lineWidth = 2;
+                        this.ctx.beginPath();
+                        
+                        for (let x = 0; x < this.visualCanvas.width; x += 5) {
+                            const y = this.visualCanvas.height/2 + 
+                                     Math.sin((x + this.waveSystem.phase * 50) * this.waveSystem.frequency + w) * this.waveSystem.amplitude +
+                                     Math.sin((x + this.waveSystem.phase * 30) * this.waveSystem.frequency * 2 + w) * this.waveSystem.amplitude * 0.5;
+                            
+                            if (x === 0) {
+                                this.ctx.moveTo(x, y);
+                            } else {
+                                this.ctx.lineTo(x, y);
+                            }
+                        }
+                        this.ctx.stroke();
+                    }
+                };
+                
+                // Render glitch effects
+                window.soundscape.renderGlitchEffects = function() {
+                    if (this.glitchSystem.active && Math.random() < this.glitchSystem.frequency) {
+                        // RGB separation
+                        const offset = this.glitchSystem.intensity * 5;
+                        const imageData = this.ctx.getImageData(0, 0, this.visualCanvas.width, this.visualCanvas.height);
+                        
+                        // Simple RGB channel shift
+                        for (let i = 0; i < imageData.data.length; i += 4) {
+                            if (Math.random() < 0.1) {
+                                imageData.data[i] = Math.min(255, imageData.data[i] + offset); // Red
+                                imageData.data[i + 2] = Math.max(0, imageData.data[i + 2] - offset); // Blue
+                            }
+                        }
+                        
+                        this.ctx.putImageData(imageData, 0, 0);
+                    }
+                };
+                
+                // Draw grid information overlay with mode info
+                window.soundscape.drawGridInfo = function() {
+                    const config = this.gridConfigs[this.currentGridConfig];
+                    const timeRemaining = this.autoModeChange ? (this.modeChangeDuration - this.modeChangeTimer).toFixed(1) : 'OFF';
+                    
+                    // Draw info overlay
+                    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+                    this.ctx.fillRect(10, 10, 400, 140);
+                    
+                    this.ctx.fillStyle = '#00ff00';
+                    this.ctx.font = '14px monospace';
+                    this.ctx.fillText(`Mode: ${this.currentMode.toUpperCase()}`, 20, 30);
+                    this.ctx.fillText(`Auto Change: ${this.autoModeChange ? 'ON' : 'OFF'} (${timeRemaining}s)`, 20, 50);
+                    this.ctx.fillText(`Grid: ${config.name} (${config.size}x${config.size})`, 20, 70);
+                    this.ctx.fillText(`Palette: ${this.currentPalette}`, 20, 90);
+                    this.ctx.fillText(`Energy: ${this.globalEnergy.toFixed(2)}`, 20, 110);
+                    this.ctx.fillText(`Particles: ${this.particles.length}`, 20, 130);
+                    
+                    // Controls help
+                    this.ctx.font = '10px monospace';
+                    this.ctx.fillStyle = '#666666';
+                    this.ctx.fillText('Q-I: Visual modes | V: Cycle | Z: Auto toggle | G: Glitch | F: Fractal | X: Explode', 20, this.visualCanvas.height - 40);
+                    this.ctx.fillText('1-7: Grid layouts | C: Cycle colors | R: Random colors', 20, this.visualCanvas.height - 20);
+                };
+                
+                console.log('toggleVisualization method:', typeof window.soundscape.toggleVisualization);
+                console.log('MANUAL METHOD ASSIGNMENT COMPLETE');
+                
+                // ALSO FIX THE BUTTON EVENT LISTENER
+                const visualBtn = document.getElementById('visualButton');
+                if (visualBtn) {
+                    console.log('Found VISUAL button, adding click listener');
+                    // Remove any existing listeners and add new one
+                    visualBtn.replaceWith(visualBtn.cloneNode(true));
+                    const newVisualBtn = document.getElementById('visualButton');
+                    newVisualBtn.addEventListener('click', () => {
+                        console.log('VISUAL button clicked!');
+                        if (window.soundscape && window.soundscape.toggleVisualization) {
+                            window.soundscape.toggleVisualization();
+                        } else {
+                            console.error('toggleVisualization not available');
+                        }
+                    });
+                    console.log('VISUAL button listener attached');
+                } else {
+                    console.error('VISUAL button not found');
+                }
+            } else {
+                console.error('App bundle failed to load - window.soundscape not found');
+            }
+        }, 2000);
+        
+    </script>
+    <script type="module" src="./src/app.js"></script>
 </body>
 </html>

@@ -174,4 +174,17 @@ export class DroneGenerator {
     getOutputNode() {
         return this.nodes.mixer;
     }
+    
+    updateTempo(masterTempo) {
+        // Update any tempo-based parameters
+        // For drone, we can adjust LFO rates to be tempo-synced
+        if (this.nodes.lfos && this.nodes.lfos.length > 0) {
+            this.nodes.lfos.forEach(lfo => {
+                if (lfo && lfo.frequency) {
+                    // Sync LFO to quarter note tempo
+                    lfo.frequency.value = masterTempo.beatsPerSecond * 0.25;
+                }
+            });
+        }
+    }
 }

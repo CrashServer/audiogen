@@ -47,6 +47,7 @@ export class ChordGenerator {
         
         const { density, progression, voicing, brightness, spread } = params;
         this.masterConnection = connectToMaster;
+        this.currentParams = params; // Store for tempo updates
         
         if (density === 0) return;
         
@@ -195,6 +196,22 @@ export class ChordGenerator {
                     this.nodes.mixer.gain.value = value;
                 }
                 break;
+        }
+    }
+    
+    updateTempo(masterTempo) {
+        // Store the master tempo for use in restart
+        this.masterTempo = masterTempo;
+        
+        // If currently playing, restart with new tempo
+        if (this.isPlaying && this.scheduler) {
+            const currentParams = this.currentParams;
+            if (currentParams) {
+                // Update the tempo in current params
+                currentParams.tempo = masterTempo.bpm;
+                this.stop();
+                this.start(currentParams, this.masterNodes);
+            }
         }
     }
 

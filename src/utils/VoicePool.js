@@ -190,29 +190,89 @@ export class GainPool extends VoicePool {
 
 /**
  * BufferSourcePool - Specialized pool for buffer sources
+ * Note: BufferSources can't be reused, so this doesn't actually pool
  */
-export class BufferSourcePool extends VoicePool {
+export class BufferSourcePool {
     constructor(audioContext, maxSize = 30) {
-        super(audioContext, (ctx) => ctx.createBufferSource(), maxSize);
+        this.audioContext = audioContext;
+        this.maxSize = maxSize;
+        this.totalCreated = 0;
+        this.active = new Map();
     }
     
     /**
-     * Acquire a buffer source with buffer
+     * Create a new buffer source (no actual pooling)
      * @param {string} id - Unique identifier
      * @param {AudioBuffer} buffer - The audio buffer to use
      * @param {Object} options - Additional options (loop, playbackRate, etc)
      * @returns {AudioBufferSourceNode} - Configured buffer source
      */
     acquireBufferSource(id, buffer, options = {}) {
-        const source = this.acquire(id);
+        // Always create a new BufferSource since they can't be reused
+        const source = this.audioContext.createBufferSource();
         
-        source.buffer = buffer;
+        // Track for statistics
+        this.active.set(source, {
+            id: id,
+            acquiredAt: Date.now()
+        });
+        this.totalCreated++;
+        
+        // Configure the source - ONLY set buffer if it's not already set
+        if (buffer && !source.buffer) {
+            source.buffer = buffer;
+        }
         if (options.loop !== undefined) source.loop = options.loop;
         if (options.playbackRate !== undefined) source.playbackRate.value = options.playbackRate;
         if (options.loopStart !== undefined) source.loopStart = options.loopStart;
         if (options.loopEnd !== undefined) source.loopEnd = options.loopEnd;
         
         return source;
+    }
+    
+    /**
+     * Release - just remove from tracking
+     */
+    release(node) {
+        if (this.active.has(node)) {
+            this.active.delete(node);
+        }
+    }
+    
+    /**
+     * Get pool statistics
+     */
+    getStats() {
+        return {
+            available: 0, // No pooling for buffer sources
+            active: this.active.size,
+            totalCreated: this.totalCreated,
+            poolEfficiency: '0%' // No reuse possible
+        };
+    }
+    
+    /**
+     * Clean up old nodes that have been active too long
+     * @param {number} maxAge - Maximum age in milliseconds
+     */
+    cleanupOld(maxAge = 30000) {
+        const now = Date.now();
+        const nodesToRelease = [];
+        
+        this.active.forEach((metadata, node) => {
+            if (now - metadata.acquiredAt > maxAge) {
+                nodesToRelease.push(node);
+            }
+        });
+        
+        nodesToRelease.forEach(node => this.release(node));
+    }
+    
+    /**
+     * Clear all tracking
+     */
+    clear() {
+        this.active.clear();
     }
 }
 

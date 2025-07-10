@@ -65,9 +65,9 @@ export class DelayEffect {
 
     setFeedback(amount) {
         if (this.nodes.feedback) {
-            // Clamp feedback to prevent runaway (max 0.95)
-            const clampedFeedback = Math.max(0, Math.min(0.95, amount));
-            this.nodes.feedback.gain.value = clampedFeedback * 0.8; // Scale down for safety
+            // Clamp feedback to prevent runaway and Larsen effect (max 0.6)
+            const clampedFeedback = Math.max(0, Math.min(0.6, amount));
+            this.nodes.feedback.gain.value = clampedFeedback * 0.5; // Scale down for safety - max 0.3
         }
     }
 

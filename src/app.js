@@ -15,10 +15,14 @@ import { ChordGenerator } from './generators/ChordGenerator.js';
 import { VocalSynthGenerator } from './generators/VocalSynthGenerator.js';
 import { KarplusStrongGenerator } from './generators/KarplusStrongGenerator.js';
 import { AdditiveSynthGenerator } from './generators/AdditiveSynthGenerator.js';
+import { BiologicalGenerator } from './generators/BiologicalGenerator.js';
+import { ChaosGenerator } from './generators/ChaosGenerator.js';
+import { SamplePlayerGenerator } from './generators/SamplePlayerGenerator.js';
 import { MasterBus } from './effects/MasterBus.js';
 import { PoolManager } from './utils/VoicePool.js';
 import { ADSREnvelope } from './utils/ADSREnvelope.js';
 import { AutomationRecorder } from './utils/AutomationRecorder.js';
+import { DataMatrix } from './visualization/DataMatrix.js';
 
 export class GenerativeSoundscape {
     constructor() {
@@ -60,7 +64,10 @@ export class GenerativeSoundscape {
             chord: true,
             vocal: true,
             karplus: true,
-            additive: true
+            additive: true,
+            biological: true,
+            chaos: true,
+            sample: true
         };
         
         // Animation state
@@ -93,8 +100,27 @@ export class GenerativeSoundscape {
         // Automation system
         this.automationRecorder = null;
         
+        // Preset system
+        this.presets = {};
+        this.currentPreset = null;
+        this.presetCategories = ['saved', 'default', 'ambient', 'techno', 'experimental'];
+        
+        // Master tempo system
+        this.masterBPM = 120;
+        this.masterTempo = {
+            bpm: 120,
+            beatsPerSecond: 2,
+            quarterNoteTime: 0.5,
+            eighthNoteTime: 0.25,
+            sixteenthNoteTime: 0.125,
+            barTime: 2.0
+        };
+        
         // Initialize UI
         this.initializeUI();
+        
+        // Initialize preset system
+        this.initializePresetSystem();
         
         // Initialize keyboard shortcuts
         this.initializeKeyboardShortcuts();
@@ -228,6 +254,18 @@ export class GenerativeSoundscape {
         // Record button
         addListener('recordButton', 'click', () => this.toggleRecording());
         
+        // Preset system
+        addListener('savePreset', 'click', () => this.savePreset());
+        addListener('loadPreset', 'click', () => this.loadPreset());
+        addListener('deletePreset', 'click', () => this.deletePreset());
+        addListener('exportPresets', 'click', () => this.exportPresets());
+        addListener('importPresets', 'click', () => this.importPresets());
+        addListener('resetPresets', 'click', () => this.resetPresets());
+        
+        // Sample player buttons
+        addListener('loadSampleFiles', 'click', () => this.loadSampleFiles());
+        addListener('clearSamples', 'click', () => this.clearSamples());
+        
         // Auto button
         addListener('autoButton', 'click', () => this.toggleAutoMode());
         
@@ -257,6 +295,14 @@ export class GenerativeSoundscape {
             if (this.masterBus) {
                 this.masterBus.setMasterVolume(parseFloat(e.target.value) / 100);
             }
+        });
+        
+        addListener('masterBPM', 'input', (e) => {
+            const display = e.target.nextElementSibling;
+            if (display && display.classList.contains('value')) {
+                display.textContent = e.target.value;
+            }
+            this.updateMasterTempo(parseInt(e.target.value));
         });
         
         addListener('reverb', 'input', (e) => {
@@ -674,6 +720,12 @@ export class GenerativeSoundscape {
         
         this.isPlaying = true;
         
+        // Expose LFO controllers and app reference to visualization
+        if (window.soundscape) {
+            window.soundscape.lfoControllers = this.lfoControllers;
+            window.soundscape.app = this; // Allow visual mode to access main app
+        }
+        
         // Update button states
         const playButton = document.getElementById('playButton');
         const stopButton = document.getElementById('stopButton');
@@ -828,6 +880,431 @@ export class GenerativeSoundscape {
         this.generators.vocal = new VocalSynthGenerator(this.audioContext, this.poolManager);
         this.generators.karplus = new KarplusStrongGenerator(this.audioContext, this.poolManager);
         this.generators.additive = new AdditiveSynthGenerator(this.audioContext, this.poolManager);
+        this.generators.biological = new BiologicalGenerator(this.audioContext, this.poolManager);
+        this.generators.chaos = new ChaosGenerator(this.audioContext, this.poolManager);
+        this.generators.sample = new SamplePlayerGenerator(this.audioContext, this.poolManager);
+    }
+
+    updateMasterTempo(bpm) {
+        this.masterBPM = bpm;
+        this.masterTempo = {
+            bpm: bpm,
+            beatsPerSecond: bpm / 60,
+            quarterNoteTime: 60 / bpm,
+            eighthNoteTime: 30 / bpm,
+            sixteenthNoteTime: 15 / bpm,
+            barTime: 240 / bpm, // 4 beats per bar
+            barsPerMinute: bpm / 4
+        };
+        
+        // Update all active generators with new tempo
+        if (this.isPlaying) {
+            this.updateGeneratorTempos();
+        }
+        
+        console.log(`Master tempo updated: ${bpm} BPM`);
+    }
+    
+    updateGeneratorTempos() {
+        // Update all generators that need tempo sync
+        Object.entries(this.generators).forEach(([name, generator]) => {
+            if (generator && generator.updateTempo && this.groupEnabled[name]) {
+                generator.updateTempo(this.masterTempo);
+            }
+        });
+    }
+    
+    getMasterTempo() {
+        return this.masterTempo;
+    }
+    
+    // Get tempo-synced timing values
+    getTempoSync(division = 'quarter') {
+        switch(division) {
+            case 'whole': return this.masterTempo.barTime;
+            case 'half': return this.masterTempo.quarterNoteTime * 2;
+            case 'quarter': return this.masterTempo.quarterNoteTime;
+            case 'eighth': return this.masterTempo.eighthNoteTime;
+            case 'sixteenth': return this.masterTempo.sixteenthNoteTime;
+            case 'triplet': return this.masterTempo.quarterNoteTime / 3;
+            case 'dotted': return this.masterTempo.quarterNoteTime * 1.5;
+            default: return this.masterTempo.quarterNoteTime;
+        }
+    }
+
+    // PRESET SYSTEM METHODS
+    
+    initializePresetSystem() {
+        // Load presets from localStorage
+        this.loadPresetsFromStorage();
+        
+        // Create default presets if none exist
+        if (Object.keys(this.presets).length === 0) {
+            this.createDefaultPresets();
+        }
+        
+        // Update UI
+        this.updatePresetUI();
+    }
+    
+    loadPresetsFromStorage() {
+        try {
+            const stored = localStorage.getItem('audiogen_presets');
+            if (stored) {
+                this.presets = JSON.parse(stored);
+            }
+        } catch (e) {
+            console.warn('Failed to load presets from storage:', e);
+            this.presets = {};
+        }
+    }
+    
+    savePresetsToStorage() {
+        try {
+            localStorage.setItem('audiogen_presets', JSON.stringify(this.presets));
+        } catch (e) {
+            console.warn('Failed to save presets to storage:', e);
+        }
+    }
+    
+    createDefaultPresets() {
+        // Create some default presets
+        this.presets = {
+            'Ambient Drone': {
+                category: 'ambient',
+                timestamp: Date.now(),
+                parameters: {
+                    masterBPM: 90,
+                    reverb: 60,
+                    delay: 30,
+                    droneFreq: 120,
+                    droneVoices: 6,
+                    droneFilter: 800,
+                    padDensity: 40,
+                    spaceMelodyDensity: 15,
+                    drumDensity: 0,
+                    glitchIntensity: 0
+                },
+                groupStates: {
+                    drone: true,
+                    ambientPad: true,
+                    spaceMelody: true,
+                    drums: false,
+                    glitch: false
+                }
+            },
+            'Techno Drive': {
+                category: 'techno',
+                timestamp: Date.now(),
+                parameters: {
+                    masterBPM: 130,
+                    reverb: 20,
+                    delay: 15,
+                    drumDensity: 80,
+                    acidLevel: 40,
+                    bleepDensity: 25,
+                    fmCarrier: 200,
+                    noiseLevel: 10
+                },
+                groupStates: {
+                    drums: true,
+                    acid: true,
+                    bleeps: true,
+                    fm: true,
+                    noise: true,
+                    drone: false
+                }
+            },
+            'Experimental Chaos': {
+                category: 'experimental',
+                timestamp: Date.now(),
+                parameters: {
+                    masterBPM: 140,
+                    reverb: 80,
+                    delay: 50,
+                    glitchIntensity: 60,
+                    chaosDensity: 70,
+                    biologicalDensity: 30,
+                    grainDensity: 40,
+                    burstActivity: 50
+                },
+                groupStates: {
+                    glitch: true,
+                    chaos: true,
+                    biological: true,
+                    granular: true,
+                    burst: true
+                }
+            }
+        };
+        this.savePresetsToStorage();
+    }
+    
+    getCurrentConfiguration() {
+        const parameters = {};
+        const groupStates = {};
+        
+        // Collect all slider values
+        document.querySelectorAll('input[type="range"]').forEach(slider => {
+            parameters[slider.id] = parseFloat(slider.value);
+        });
+        
+        // Collect all select values
+        document.querySelectorAll('select').forEach(select => {
+            parameters[select.id] = select.value;
+        });
+        
+        // Collect all checkbox states (non-group)
+        document.querySelectorAll('input[type="checkbox"]:not(.group-enable)').forEach(checkbox => {
+            parameters[checkbox.id] = checkbox.checked;
+        });
+        
+        // Collect group enable states
+        document.querySelectorAll('.group-enable').forEach(checkbox => {
+            const groupName = checkbox.id.replace('Enable', '');
+            groupStates[groupName] = checkbox.checked;
+        });
+        
+        return {
+            parameters,
+            groupStates,
+            timestamp: Date.now()
+        };
+    }
+    
+    applyConfiguration(config) {
+        // Apply parameters
+        if (config.parameters) {
+            Object.entries(config.parameters).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (element.type === 'range') {
+                        element.value = value;
+                        // Update display
+                        const display = element.nextElementSibling;
+                        if (display && display.classList.contains('value')) {
+                            display.textContent = value;
+                        }
+                        // Trigger change event
+                        element.dispatchEvent(new Event('input'));
+                    } else if (element.type === 'checkbox') {
+                        element.checked = value;
+                        element.dispatchEvent(new Event('change'));
+                    } else if (element.tagName === 'SELECT') {
+                        element.value = value;
+                        element.dispatchEvent(new Event('change'));
+                    }
+                }
+            });
+        }
+        
+        // Apply group states
+        if (config.groupStates) {
+            Object.entries(config.groupStates).forEach(([groupName, enabled]) => {
+                const checkbox = document.getElementById(groupName + 'Enable');
+                if (checkbox) {
+                    checkbox.checked = enabled;
+                    checkbox.dispatchEvent(new Event('change'));
+                }
+            });
+        }
+        
+        // Update master tempo if present
+        if (config.parameters && config.parameters.masterBPM) {
+            this.updateMasterTempo(config.parameters.masterBPM);
+        }
+        
+        // Restart generators if playing
+        if (this.isPlaying) {
+            this.stop();
+            setTimeout(() => this.start(), 100);
+        }
+    }
+    
+    savePreset() {
+        const nameInput = document.getElementById('presetName');
+        const name = nameInput.value.trim();
+        
+        if (!name) {
+            alert('Please enter a preset name');
+            return;
+        }
+        
+        if (this.presets[name]) {
+            if (!confirm(`Preset "${name}" already exists. Overwrite?`)) {
+                return;
+            }
+        }
+        
+        const config = this.getCurrentConfiguration();
+        this.presets[name] = {
+            category: 'saved',
+            ...config
+        };
+        
+        this.savePresetsToStorage();
+        this.updatePresetUI();
+        
+        // Clear name input
+        nameInput.value = '';
+        
+        // Select the newly saved preset
+        const select = document.getElementById('presetSelect');
+        select.value = name;
+        
+        console.log(`Preset "${name}" saved successfully`);
+    }
+    
+    loadPreset() {
+        const select = document.getElementById('presetSelect');
+        const name = select.value;
+        
+        if (!name || !this.presets[name]) {
+            alert('Please select a preset to load');
+            return;
+        }
+        
+        this.applyConfiguration(this.presets[name]);
+        this.currentPreset = name;
+        
+        console.log(`Preset "${name}" loaded successfully`);
+    }
+    
+    deletePreset() {
+        const select = document.getElementById('presetSelect');
+        const name = select.value;
+        
+        if (!name || !this.presets[name]) {
+            alert('Please select a preset to delete');
+            return;
+        }
+        
+        if (this.presets[name].category === 'default') {
+            alert('Cannot delete default presets');
+            return;
+        }
+        
+        if (confirm(`Delete preset "${name}"?`)) {
+            delete this.presets[name];
+            this.savePresetsToStorage();
+            this.updatePresetUI();
+            
+            // Clear selection
+            select.value = '';
+            
+            console.log(`Preset "${name}" deleted successfully`);
+        }
+    }
+    
+    exportPresets() {
+        const data = {
+            presets: this.presets,
+            version: '1.0',
+            timestamp: Date.now()
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'audiogen_presets.json';
+        a.click();
+        
+        URL.revokeObjectURL(url);
+        console.log('Presets exported successfully');
+    }
+    
+    importPresets() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.presets) {
+                        // Merge with existing presets
+                        this.presets = { ...this.presets, ...data.presets };
+                        this.savePresetsToStorage();
+                        this.updatePresetUI();
+                        
+                        console.log('Presets imported successfully');
+                    } else {
+                        alert('Invalid preset file format');
+                    }
+                } catch (error) {
+                    console.error('Error importing presets:', error);
+                    alert('Error importing presets: Invalid JSON format');
+                }
+            };
+            
+            reader.readAsText(file);
+        };
+        
+        input.click();
+    }
+    
+    resetPresets() {
+        if (confirm('Reset all presets to defaults? This will delete all saved presets.')) {
+            this.presets = {};
+            this.createDefaultPresets();
+            this.updatePresetUI();
+            console.log('Presets reset to defaults');
+        }
+    }
+    
+    loadSampleFiles() {
+        const fileInput = document.getElementById('sampleFileInput');
+        if (fileInput) {
+            fileInput.click();
+        }
+    }
+    
+    clearSamples() {
+        if (this.generators.sample) {
+            this.generators.sample.clearSamples();
+            console.log('All samples cleared');
+        }
+    }
+    
+    updatePresetUI() {
+        const select = document.getElementById('presetSelect');
+        if (!select) return;
+        
+        // Clear existing options
+        select.innerHTML = '<option value="">Select preset...</option>';
+        
+        // Group presets by category
+        const categories = {};
+        Object.entries(this.presets).forEach(([name, preset]) => {
+            const category = preset.category || 'saved';
+            if (!categories[category]) categories[category] = [];
+            categories[category].push(name);
+        });
+        
+        // Add options grouped by category
+        Object.entries(categories).forEach(([category, names]) => {
+            if (names.length > 0) {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = category.toUpperCase();
+                
+                names.sort().forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    optgroup.appendChild(option);
+                });
+                
+                select.appendChild(optgroup);
+            }
+        });
     }
 
     startGenerators() {
@@ -850,7 +1327,7 @@ export class GenerativeSoundscape {
         if (this.groupEnabled.drums) {
             const drumParams = {
                 pattern: document.getElementById('drumPattern').value,
-                tempo: parseInt(document.getElementById('drumTempo').value),
+                tempo: this.masterBPM, // Use master BPM instead of drum tempo
                 density: parseFloat(document.getElementById('drumDensity').value) / 100,
                 variation: parseFloat(document.getElementById('drumVariation').value) / 100,
                 swing: parseFloat(document.getElementById('drumSwing').value) / 100,
@@ -992,7 +1469,7 @@ export class GenerativeSoundscape {
                 speed: parseInt(document.getElementById('arpSpeed').value),
                 octaves: parseInt(document.getElementById('arpOctaves').value),
                 gate: parseFloat(document.getElementById('arpGate').value) / 100,
-                tempo: parseInt(document.getElementById('drumTempo').value)
+                tempo: this.masterBPM // Use master BPM
             };
             this.generators.arpeggiator.start(arpeggiatorParams, this.masterBus.getConnectionNodes());
         }
@@ -1045,6 +1522,52 @@ export class GenerativeSoundscape {
             };
             this.generators.additive.start(additiveParams, (node) => this.connectToMaster(node));
         }
+        
+        // Start Biological Patterns if enabled
+        if (this.groupEnabled.biological) {
+            const biologicalParams = {
+                density: parseFloat(document.getElementById('bioDensity').value) / 100,
+                type: document.getElementById('bioType').value,
+                evolution: parseFloat(document.getElementById('bioEvolution').value),
+                harmony: parseFloat(document.getElementById('bioHarmony').value) / 100,
+                variation: parseFloat(document.getElementById('bioVariation').value) / 100,
+                complexity: parseFloat(document.getElementById('bioComplexity').value) / 100,
+                adaptive: document.getElementById('bioAdaptive').checked
+            };
+            this.generators.biological.start(biologicalParams, (node) => this.connectToMaster(node));
+        }
+        
+        // Start Chaos Theory if enabled
+        if (this.groupEnabled.chaos) {
+            const chaosParams = {
+                density: parseFloat(document.getElementById('chaosDensity').value) / 100,
+                type: document.getElementById('chaosType').value,
+                intensity: parseFloat(document.getElementById('chaosIntensity').value) / 100,
+                scale: document.getElementById('chaosScale').value,
+                resonance: parseFloat(document.getElementById('chaosResonance').value) / 100,
+                speed: parseFloat(document.getElementById('chaosSpeed').value),
+                filter: document.getElementById('chaosFilter').checked
+            };
+            this.generators.chaos.start(chaosParams, (node) => this.connectToMaster(node));
+        }
+        
+        // Start Sample Player if enabled
+        if (this.groupEnabled.sample) {
+            const sampleParams = {
+                density: parseFloat(document.getElementById('sampleDensity').value) / 100,
+                pitch: parseFloat(document.getElementById('samplePitch').value),
+                reverse: parseFloat(document.getElementById('sampleReverse').value) / 100,
+                chop: parseFloat(document.getElementById('sampleChop').value) / 100,
+                scatter: parseFloat(document.getElementById('sampleScatter').value) / 100,
+                granular: parseFloat(document.getElementById('sampleGranular').value) / 100,
+                filterFreq: parseFloat(document.getElementById('sampleFilterFreq').value),
+                filterRes: parseFloat(document.getElementById('sampleFilterRes').value)
+            };
+            this.generators.sample.start(sampleParams, this.masterBus.getConnectionNodes());
+        }
+        
+        // Initialize master tempo and sync all generators
+        this.updateMasterTempo(this.masterBPM);
     }
 
     connectToMaster(node) {
@@ -1394,6 +1917,8 @@ export class GenerativeSoundscape {
         if (paramId.startsWith('vocal')) return 'vocal';
         if (paramId.startsWith('karplus')) return 'karplus';
         if (paramId.startsWith('additive')) return 'additive';
+        if (paramId.startsWith('bio')) return 'biological';
+        if (paramId.startsWith('chaos')) return 'chaos';
         if (paramId.startsWith('sample')) return 'sample';
         return null; // Master/effect parameters
     }
@@ -1401,6 +1926,7 @@ export class GenerativeSoundscape {
     randomize() {
         const params = [
             // Master (excluding volume)
+            { id: 'masterBPM', min: 80, max: 160 },
             { id: 'reverb', min: 0, max: 100 },
             { id: 'delay', min: 0, max: 100 },
             { id: 'delayTime', min: 0.1, max: 1 },
@@ -1496,12 +2022,26 @@ export class GenerativeSoundscape {
             { id: 'additiveDecay', min: 1, max: 2 },
             { id: 'additiveInharmonicity', min: 0, max: 5 },
             { id: 'additiveBrightness', min: 1000, max: 5000 },
+            // Biological Patterns
+            { id: 'bioDensity', min: 0, max: 30 },
+            { id: 'bioEvolution', min: 50, max: 200 },
+            { id: 'bioHarmony', min: 30, max: 90 },
+            { id: 'bioVariation', min: 20, max: 80 },
+            { id: 'bioComplexity', min: 30, max: 90 },
+            // Chaos Theory
+            { id: 'chaosDensity', min: 0, max: 30 },
+            { id: 'chaosIntensity', min: 20, max: 80 },
+            { id: 'chaosResonance', min: 30, max: 90 },
+            { id: 'chaosSpeed', min: 50, max: 150 },
             // Sample Player
             { id: 'sampleDensity', min: 0, max: 30 },
             { id: 'samplePitch', min: 0.5, max: 2 },
             { id: 'sampleReverse', min: 0, max: 50 },
             { id: 'sampleChop', min: 0, max: 50 },
             { id: 'sampleScatter', min: 0, max: 50 },
+            { id: 'sampleGranular', min: 0, max: 50 },
+            { id: 'sampleFilterFreq', min: 1000, max: 8000 },
+            { id: 'sampleFilterRes', min: 0.5, max: 5 },
             // Effects
             { id: 'compressorMix', min: 50, max: 100 },
             { id: 'compThreshold', min: 20, max: 60 },
@@ -2811,14 +3351,24 @@ Press any key to close this help.`;
         // Default to global envelope
         return this.globalEnvelope;
     }
+
+    toggleVisualization() {
+        console.log('toggleVisualization called');
+        if (!this.dataMatrix) {
+            this.dataMatrix = new DataMatrix(document.body);
+        }
+        this.dataMatrix.toggle();
+    }
 }
 
-// Initialize when DOM is ready
+// Initialize when DOM is ready  
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
+        console.log('Creating soundscape with toggleVisualization method');
         window.soundscape = new GenerativeSoundscape();
     });
 } else {
     // DOM is already loaded
+    console.log('Creating soundscape immediately with toggleVisualization method');
     window.soundscape = new GenerativeSoundscape();
 }

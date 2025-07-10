@@ -12,6 +12,7 @@ export class AdvancedDrumsGenerator {
         this.poolManager = poolManager;
         this.scheduler = null;
         this.isPlaying = false;
+        this.performanceThrottle = 1;
         
         // Sample storage for external drum kits
         this.drumSamples = new Map();
@@ -61,16 +62,28 @@ export class AdvancedDrumsGenerator {
     setupFileInput() {
         // This will be called from the app after DOM is ready
         const fileInput = document.getElementById('drumKitFileInput');
+        console.log('setupFileInput called, fileInput element:', fileInput);
+        
         if (fileInput && !fileInput.hasAttribute('data-listener-attached')) {
             fileInput.setAttribute('data-listener-attached', 'true');
+            console.log('Adding change event listener to file input');
+            
             fileInput.addEventListener('change', async (e) => {
+                console.log('File input change event triggered');
                 const files = Array.from(e.target.files);
+                console.log('Files selected:', files);
                 await this.loadDrumKit(files);
             });
+        } else if (fileInput) {
+            console.log('File input already has listener attached');
+        } else {
+            console.error('drumKitFileInput element not found!');
         }
     }
     
     async loadDrumKit(files) {
+        console.log('loadDrumKit called with', files.length, 'files');
+        
         // Clear existing samples
         this.drumSamples.clear();
         Object.keys(this.sampleMapping).forEach(key => {
@@ -79,22 +92,32 @@ export class AdvancedDrumsGenerator {
         
         // Load each file
         for (const file of files) {
-            if (file.type.startsWith('audio/')) {
+            console.log('Processing file:', file.name, 'Type:', file.type, 'Size:', file.size);
+            
+            if (file.type.startsWith('audio/') || file.name.match(/\.(wav|mp3|ogg|m4a|flac)$/i)) {
                 try {
                     const arrayBuffer = await file.arrayBuffer();
+                    console.log('ArrayBuffer loaded, size:', arrayBuffer.byteLength);
+                    
                     const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+                    console.log('Audio decoded successfully, duration:', audioBuffer.duration, 'seconds');
+                    
                     const sampleName = file.name.toLowerCase().replace(/\.[^/.]+$/, '');
                     
                     this.drumSamples.set(sampleName, audioBuffer);
                     this.autoMapSample(sampleName);
                     
-                    console.log(`Loaded drum sample: ${sampleName}`);
+                    console.log(`Loaded drum sample: ${sampleName}, total samples:`, this.drumSamples.size);
                 } catch (err) {
-                    console.warn(`Failed to load drum sample ${file.name}:`, err);
+                    console.error(`Failed to load drum sample ${file.name}:`, err);
                 }
+            } else {
+                console.warn('Skipping non-audio file:', file.name);
             }
         }
         
+        console.log('Final sample mapping:', this.sampleMapping);
+        console.log('Total loaded samples:', this.drumSamples.size);
         this.updateSampleMappingUI();
     }
     
@@ -544,5 +567,9 @@ export class AdvancedDrumsGenerator {
                 perc: [0, 0, 0.4, 0, 0, 0, 0.3, 0, 0, 0, 0, 0.5, 0, 0, 0, 0]
             }
         };
+    }
+
+    setPerformanceThrottle(value) {
+        this.performanceThrottle = value;
     }
 }

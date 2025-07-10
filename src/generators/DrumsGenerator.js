@@ -15,6 +15,7 @@ export class DrumsGenerator {
         
         const { pattern, tempo, density, variation, swing, snareRush, ghostNotes, hihatSpeed } = params;
         this.masterNodes = masterNodes;
+        this.currentParams = params; // Store for tempo updates
         
         const interval = 60000 / (tempo * 8); // 32nd notes
         let step = 0;
@@ -575,5 +576,21 @@ export class DrumsGenerator {
 
     setPerformanceThrottle(value) {
         this.performanceThrottle = value;
+    }
+    
+    updateTempo(masterTempo) {
+        // Store the master tempo for use in restart
+        this.masterTempo = masterTempo;
+        
+        // If currently playing, restart with new tempo
+        if (this.isPlaying && this.scheduler) {
+            const currentParams = this.currentParams;
+            if (currentParams) {
+                // Update the tempo in current params
+                currentParams.tempo = masterTempo.bpm;
+                this.stop();
+                this.start(currentParams, this.masterNodes);
+            }
+        }
     }
 }
